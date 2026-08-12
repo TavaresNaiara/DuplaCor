@@ -1,5 +1,11 @@
 package model;
 
+import java.util.Objects;
+
+/**
+ * Representa a entidade Categoria no sistema Dupla Cor.
+ * Mapeamento da tabela: Categoria
+ */
 public class Categoria {
 
     private int idCategoria;
@@ -10,9 +16,15 @@ public class Categoria {
     public Categoria() {
     }
 
-    // Construtor com parâmetros
+    // Construtor completo com ID
     public Categoria(int idCategoria, String nome, String descricao) {
         this.idCategoria = idCategoria;
+        this.nome = nome;
+        this.descricao = descricao;
+    }
+
+    // Construtor para inserção
+    public Categoria(String nome, String descricao) {
         this.nome = nome;
         this.descricao = descricao;
     }
@@ -41,6 +53,19 @@ public class Categoria {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Categoria categoria = (Categoria) o;
+        return idCategoria == categoria.idCategoria;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idCategoria);
     }
 
     @Override

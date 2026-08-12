@@ -1,37 +1,69 @@
 package model;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
+/**
+ * Representa a entidade Lote no sistema Dupla Cor (Gestão de Estoque por Lote / FEFO).
+ * Mapeamento da tabela: Lote
+ */
 public class Lote {
 
     private int idLote;
-    private String numeroLote;
-    private LocalDate dataFabricacao;
+    private int quantInicial;
+    private int quantAtual;
     private LocalDate dataValidade;
-    private int quantidade;
-    private BigDecimal precoCompra;
-    private BigDecimal precoVenda;
+    private LocalDate dataEntrada;
+    private String status;
+    private int produtoId;
     private Produto produto;
 
-   
+    // Construtor vazio
     public Lote() {
     }
 
-    
-    public Lote(int idLote, String numeroLote, LocalDate dataFabricacao,
-                LocalDate dataValidade, int quantidade,
-                BigDecimal precoCompra, BigDecimal precoVenda,
-                Produto produto) {
+    // Construtor com ID (leitura do banco)
+    public Lote(int idLote, int quantInicial, int quantAtual, LocalDate dataValidade,
+                LocalDate dataEntrada, String status, int produtoId) {
         this.idLote = idLote;
-        this.numeroLote = numeroLote;
-        this.dataFabricacao = dataFabricacao;
+        this.quantInicial = quantInicial;
+        this.quantAtual = quantAtual;
         this.dataValidade = dataValidade;
-        this.quantidade = quantidade;
-        this.precoCompra = precoCompra;
-        this.precoVenda = precoVenda;
-        this.produto = produto;
+        this.dataEntrada = dataEntrada;
+        this.status = status;
+        this.produtoId = produtoId;
     }
+
+    // Construtor completo com Produto objeto
+    public Lote(int idLote, int quantInicial, int quantAtual, LocalDate dataValidade,
+                LocalDate dataEntrada, String status, Produto produto) {
+        this.idLote = idLote;
+        this.quantInicial = quantInicial;
+        this.quantAtual = quantAtual;
+        this.dataValidade = dataValidade;
+        this.dataEntrada = dataEntrada;
+        this.status = status;
+        this.produto = produto;
+        if (produto != null) {
+            this.produtoId = produto.getIdProduto();
+        }
+    }
+
+    // Construtor para inserção (sem ID)
+    public Lote(int quantInicial, int quantAtual, LocalDate dataValidade,
+                LocalDate dataEntrada, String status, Produto produto) {
+        this.quantInicial = quantInicial;
+        this.quantAtual = quantAtual;
+        this.dataValidade = dataValidade;
+        this.dataEntrada = dataEntrada;
+        this.status = status;
+        this.produto = produto;
+        if (produto != null) {
+            this.produtoId = produto.getIdProduto();
+        }
+    }
+
+    // Getters e Setters
 
     public int getIdLote() {
         return idLote;
@@ -41,20 +73,20 @@ public class Lote {
         this.idLote = idLote;
     }
 
-    public String getNumeroLote() {
-        return numeroLote;
+    public int getQuantInicial() {
+        return quantInicial;
     }
 
-    public void setNumeroLote(String numeroLote) {
-        this.numeroLote = numeroLote;
+    public void setQuantInicial(int quantInicial) {
+        this.quantInicial = quantInicial;
     }
 
-    public LocalDate getDataFabricacao() {
-        return dataFabricacao;
+    public int getQuantAtual() {
+        return quantAtual;
     }
 
-    public void setDataFabricacao(LocalDate dataFabricacao) {
-        this.dataFabricacao = dataFabricacao;
+    public void setQuantAtual(int quantAtual) {
+        this.quantAtual = quantAtual;
     }
 
     public LocalDate getDataValidade() {
@@ -65,28 +97,31 @@ public class Lote {
         this.dataValidade = dataValidade;
     }
 
-    public int getQuantidade() {
-        return quantidade;
+    public LocalDate getDataEntrada() {
+        return dataEntrada;
     }
 
-    public void setQuantidade(int quantidade) {
-        this.quantidade = quantidade;
+    public void setDataEntrada(LocalDate dataEntrada) {
+        this.dataEntrada = dataEntrada;
     }
 
-    public BigDecimal getPrecoCompra() {
-        return precoCompra;
+    public String getStatus() {
+        return status;
     }
 
-    public void setPrecoCompra(BigDecimal precoCompra) {
-        this.precoCompra = precoCompra;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public BigDecimal getPrecoVenda() {
-        return precoVenda;
+    public int getProdutoId() {
+        if (produto != null) {
+            return produto.getIdProduto();
+        }
+        return produtoId;
     }
 
-    public void setPrecoVenda(BigDecimal precoVenda) {
-        this.precoVenda = precoVenda;
+    public void setProdutoId(int produtoId) {
+        this.produtoId = produtoId;
     }
 
     public Produto getProduto() {
@@ -95,19 +130,42 @@ public class Lote {
 
     public void setProduto(Produto produto) {
         this.produto = produto;
+        if (produto != null) {
+            this.produtoId = produto.getIdProduto();
+        }
+    }
+
+    /**
+     * Verifica se o lote já ultrapassou a data de validade
+     */
+    public boolean isVencido() {
+        return dataValidade != null && dataValidade.isBefore(LocalDate.now());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Lote lote = (Lote) o;
+        return idLote == lote.idLote;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idLote);
     }
 
     @Override
     public String toString() {
         return "Lote{" +
                 "idLote=" + idLote +
-                ", numeroLote='" + numeroLote + '\'' +
-                ", dataFabricacao=" + dataFabricacao +
+                ", quantInicial=" + quantInicial +
+                ", quantAtual=" + quantAtual +
                 ", dataValidade=" + dataValidade +
-                ", quantidade=" + quantidade +
-                ", precoCompra=" + precoCompra +
-                ", precoVenda=" + precoVenda +
-                ", produto=" + produto.getNome() +
+                ", dataEntrada=" + dataEntrada +
+                ", status='" + status + '\'' +
+                ", produtoId=" + getProdutoId() +
+                (produto != null ? ", produto='" + produto.getNome() + '\'' : "") +
                 '}';
     }
 }

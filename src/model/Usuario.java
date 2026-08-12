@@ -1,25 +1,29 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
+/**
+ * Representa a entidade Usuario no sistema Dupla Cor.
+ * Mapeamento da tabela: Usuario
+ */
 public class Usuario {
 
-    private int 		idUsuario;
-    private String 		nome;
-    private String 		email;
-    private String 		senha;
-    private String 		perfil;
+    private int idUsuario;
+    private String nome;
+    private String email;
+    private String senha;
+    private String perfil;
     private LocalDateTime dataCadastro;
     private String tokenRecuperacao;
 
-    
+    // Construtor vazio
     public Usuario() {
     }
 
-    // Construtor com todos os atributos
+    // Construtor com ID (leitura do banco)
     public Usuario(int idUsuario, String nome, String email, String senha,
-                   String perfil, LocalDateTime dataCadastro,
-                   String tokenRecuperacao) {
+                   String perfil, LocalDateTime dataCadastro, String tokenRecuperacao) {
         this.idUsuario = idUsuario;
         this.nome = nome;
         this.email = email;
@@ -27,6 +31,15 @@ public class Usuario {
         this.perfil = perfil;
         this.dataCadastro = dataCadastro;
         this.tokenRecuperacao = tokenRecuperacao;
+    }
+
+    // Construtor para cadastro inicial
+    public Usuario(String nome, String email, String senha, String perfil) {
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.perfil = perfil;
+        this.dataCadastro = LocalDateTime.now();
     }
 
     // Getters e Setters
@@ -88,6 +101,19 @@ public class Usuario {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Usuario usuario = (Usuario) o;
+        return idUsuario == usuario.idUsuario;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idUsuario);
+    }
+
+    @Override
     public String toString() {
         return "Usuario{" +
                 "idUsuario=" + idUsuario +
@@ -95,6 +121,7 @@ public class Usuario {
                 ", email='" + email + '\'' +
                 ", perfil='" + perfil + '\'' +
                 ", dataCadastro=" + dataCadastro +
+                ", tokenRecuperacao='" + tokenRecuperacao + '\'' +
                 '}';
     }
 }

@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # Banco de Dados MySQL
+  # ----------------------------------------------------------------------------
+  mysql:
+    image: mysql:8.0
+    container_name: duplacor-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-duplacor}
+      MYSQL_USER: ${DB_USER:-duplacor}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-duplacor}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-duplacor}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    networks:
+      - duplacor-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  # ----------------------------------------------------------------------------
+  # Aplicação Java Web & REST API (Dupla Cor)
+  # ----------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: duplacor-app
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-duplacor}
+      DB_USER: ${DB_USER:-duplacor}
+      DB_PASSWORD: ${DB_PASSWORD:-duplacor}
+      PORT: 8080
+    networks:
+      - duplacor-net
+
+networks:
+  duplacor-net:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local

@@ -1,137 +1,173 @@
 package model;
 
-import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-
+/**
+ * Representa a entidade Pedido no sistema Dupla Cor (Registro de vendas).
+ * Mapeamento da tabela: Pedido
+ */
 public class Pedido {
 
-	private Integer idPedido;
-	private LocalDateTime dataVenda;
-	private BigDecimal total;
-	private String statusPagamento;
-	private Usuario usuario;
-	private List<ItemPedido> itensPedido;
+    private int idPedido;
+    private LocalDateTime dataVenda;
+    private BigDecimal total;
+    private String statusPagamento;
+    private int usuarioId;
+    private Usuario usuario;
+    private List<ItemPedido> itensPedido;
 
-	
-	public Pedido() {
-		this.itensPedido = new ArrayList<>();
-	}
+    // Construtor vazio
+    public Pedido() {
+        this.itensPedido = new ArrayList<>();
+        this.total = BigDecimal.ZERO;
+    }
 
-	
-	public Pedido(Integer idPedido, LocalDateTime dataVenda, BigDecimal total, String statusPagamento,
-			Usuario usuario) {
-		this.idPedido = idPedido;
-		this.dataVenda = dataVenda;
-		this.total = total;
-		this.statusPagamento = statusPagamento;
-		this.usuario = usuario;
-		this.itensPedido = new ArrayList<>();
-	}
+    // Construtor com ID (leitura do banco)
+    public Pedido(int idPedido, LocalDateTime dataVenda, BigDecimal total,
+                  String statusPagamento, int usuarioId) {
+        this.idPedido = idPedido;
+        this.dataVenda = dataVenda;
+        this.total = total;
+        this.statusPagamento = statusPagamento;
+        this.usuarioId = usuarioId;
+        this.itensPedido = new ArrayList<>();
+    }
 
-	
-	public Pedido(Integer idPedido, LocalDateTime dataVenda, BigDecimal total, String statusPagamento,
-			Usuario usuario, List<ItemPedido> itensPedido) {
-		this.idPedido = idPedido;
-		this.dataVenda = dataVenda;
-		this.total = total;
-		this.statusPagamento = statusPagamento;
-		this.usuario = usuario;
-		this.itensPedido = itensPedido != null ? itensPedido : new ArrayList<>();
-	}
+    // Construtor completo com Usuario objeto
+    public Pedido(int idPedido, LocalDateTime dataVenda, BigDecimal total,
+                  String statusPagamento, Usuario usuario) {
+        this.idPedido = idPedido;
+        this.dataVenda = dataVenda;
+        this.total = total;
+        this.statusPagamento = statusPagamento;
+        this.usuario = usuario;
+        if (usuario != null) {
+            this.usuarioId = usuario.getIdUsuario();
+        }
+        this.itensPedido = new ArrayList<>();
+    }
 
-	//  GETTERS E SETTERS 
+    // Construtor para inserção (sem ID)
+    public Pedido(BigDecimal total, String statusPagamento, Usuario usuario) {
+        this.dataVenda = LocalDateTime.now();
+        this.total = total;
+        this.statusPagamento = statusPagamento;
+        this.usuario = usuario;
+        if (usuario != null) {
+            this.usuarioId = usuario.getIdUsuario();
+        }
+        this.itensPedido = new ArrayList<>();
+    }
 
-	public Integer getIdPedido() {
-		return idPedido;
-	}
+    // Getters e Setters
 
-	public void setIdPedido(Integer idPedido) {
-		this.idPedido = idPedido;
-	}
+    public int getIdPedido() {
+        return idPedido;
+    }
 
-	public LocalDateTime getDataVenda() {
-		return dataVenda;
-	}
+    public void setIdPedido(int idPedido) {
+        this.idPedido = idPedido;
+    }
 
-	public void setDataVenda(LocalDateTime dataVenda) {
-		this.dataVenda = dataVenda;
-	}
+    public LocalDateTime getDataVenda() {
+        return dataVenda;
+    }
 
-	public BigDecimal getTotal() {
-		return total;
-	}
+    public void setDataVenda(LocalDateTime dataVenda) {
+        this.dataVenda = dataVenda;
+    }
 
-	public void setTotal(BigDecimal total) {
-		this.total = total;
-	}
+    public BigDecimal getTotal() {
+        return total;
+    }
 
-	public String getStatusPagamento() {
-		return statusPagamento;
-	}
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
 
-	public void setStatusPagamento(String statusPagamento) {
-		this.statusPagamento = statusPagamento;
-	}
+    public String getStatusPagamento() {
+        return statusPagamento;
+    }
 
-	public Usuario getUsuario() {
-		return usuario;
-	}
+    public void setStatusPagamento(String statusPagamento) {
+        this.statusPagamento = statusPagamento;
+    }
 
-	public void setUsuario(Usuario usuario) {
-		this.usuario = usuario;
-	}
+    public int getUsuarioId() {
+        if (usuario != null) {
+            return usuario.getIdUsuario();
+        }
+        return usuarioId;
+    }
 
-	public List<ItemPedido> getItensPedido() {
-		return itensPedido;
-	}
+    public void setUsuarioId(int usuarioId) {
+        this.usuarioId = usuarioId;
+    }
 
-	public void setItensPedido(List<ItemPedido> itensPedido) {
-		this.itensPedido = itensPedido;
-	}
+    public Usuario getUsuario() {
+        return usuario;
+    }
 
-	
-	public void adicionarItem(ItemPedido item) {
-		if (item != null) {
-			this.itensPedido.add(item);
-		}
-	}
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+        if (usuario != null) {
+            this.usuarioId = usuario.getIdUsuario();
+        }
+    }
 
-	
-	public void removerItem(ItemPedido item) {
-		if (item != null) {
-			this.itensPedido.remove(item);
-		}
-	}
+    public List<ItemPedido> getItensPedido() {
+        return itensPedido;
+    }
 
-	// EQUALS E HASHCODE 
+    public void setItensPedido(List<ItemPedido> itensPedido) {
+        this.itensPedido = (itensPedido != null) ? itensPedido : new ArrayList<>();
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(idPedido);
-	}
+    public void adicionarItem(ItemPedido item) {
+        if (item != null) {
+            this.itensPedido.add(item);
+            recalcularTotal();
+        }
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Pedido other = (Pedido) obj;
-		return Objects.equals(idPedido, other.idPedido);
-	}
+    public void recalcularTotal() {
+        BigDecimal soma = BigDecimal.ZERO;
+        for (ItemPedido item : itensPedido) {
+            if (item.getPrecoAplicado() != null && item.getQuantidade() > 0) {
+                BigDecimal subtotal = item.getPrecoAplicado().multiply(BigDecimal.valueOf(item.getQuantidade()));
+                soma = soma.add(subtotal);
+            }
+        }
+        this.total = soma;
+    }
 
-	//  TO STRING
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pedido pedido = (Pedido) o;
+        return idPedido == pedido.idPedido;
+    }
 
-	@Override
-	public String toString() {
-		return "Pedido [idPedido=" + idPedido + ", dataVenda=" + dataVenda + ", total=" + total
-				+ ", statusPagamento=" + statusPagamento + ", usuario=" + usuario.getNome() + ", quantidadeItens="
-				+ itensPedido.size() + "]";
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(idPedido);
+    }
+
+    @Override
+    public String toString() {
+        return "Pedido{" +
+                "idPedido=" + idPedido +
+                ", dataVenda=" + dataVenda +
+                ", total=" + total +
+                ", statusPagamento='" + statusPagamento + '\'' +
+                ", usuarioId=" + getUsuarioId() +
+                (usuario != null ? ", usuario='" + usuario.getNome() + '\'' : "") +
+                ", itens=" + itensPedido.size() +
+                '}';
+    }
 }

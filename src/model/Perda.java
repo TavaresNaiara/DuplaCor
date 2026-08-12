@@ -1,174 +1,143 @@
 package model;
 
-import java.time.LocalDate;
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
-
+/**
+ * Representa a entidade Perda no sistema Dupla Cor (Auditoria de perdas por validade/avarias).
+ * Mapeamento da tabela: Perda
+ */
 public class Perda {
 
-	private Integer 	idPerda;
-	private Produto 	produto;
-	private Integer 	quantidade;
-	private LocalDate 	dataVenda;
-	private LocalDate 	dataRegistro;
-	private BigDecimal 	precoCusto;
-	private BigDecimal 	valorPerda;
-	private String 		motivo;
-	private String 		observacoes;
+    private int idPerda;
+    private Integer quantidade;
+    private LocalDateTime dataRegistro;
+    private String motivo;
+    private int loteId;
+    private Lote lote;
 
-	/**
-	 * Construtor vazio da classe Perda
-	 */
-	public Perda() {
-	}
+    // Construtor vazio
+    public Perda() {
+    }
 
-	
-	public Perda(Integer idPerda, Produto produto, Integer quantidade, LocalDate dataVenda, LocalDate dataRegistro,
-			BigDecimal precoCusto, BigDecimal valorPerda, String motivo, String observacoes) {
-		this.idPerda = idPerda;
-		this.produto = produto;
-		this.quantidade = quantidade;
-		this.dataVenda = dataVenda;
-		this.dataRegistro = dataRegistro;
-		this.precoCusto = precoCusto;
-		this.valorPerda = valorPerda;
-		this.motivo = motivo;
-		this.observacoes = observacoes;
-	}
+    // Construtor completo com ID (leitura do banco)
+    public Perda(int idPerda, Integer quantidade, LocalDateTime dataRegistro, String motivo, int loteId) {
+        this.idPerda = idPerda;
+        this.quantidade = quantidade;
+        this.dataRegistro = dataRegistro;
+        this.motivo = motivo;
+        this.loteId = loteId;
+    }
 
-	/**
-	 * Construtor alternativo sem ID (para inserção em banco)
-	 */
-	public Perda(Produto produto, Integer quantidade, LocalDate dataVenda, BigDecimal precoCusto, String motivo) {
-		this.produto = produto;
-		this.quantidade = quantidade;
-		this.dataVenda = dataVenda;
-		this.precoCusto = precoCusto;
-		this.motivo = motivo;
-		this.dataRegistro = LocalDate.now();
-		calcularValorPerda();
-	}
+    // Construtor completo com Lote objeto
+    public Perda(int idPerda, Integer quantidade, LocalDateTime dataRegistro, String motivo, Lote lote) {
+        this.idPerda = idPerda;
+        this.quantidade = quantidade;
+        this.dataRegistro = dataRegistro;
+        this.motivo = motivo;
+        this.lote = lote;
+        if (lote != null) {
+            this.loteId = lote.getIdLote();
+        }
+    }
 
-	//  GETTERS E SETTERS 
-	
-	public Integer getIdPerda() {
-		return idPerda;
-	}
+    // Construtor para inserção (sem ID)
+    public Perda(Integer quantidade, String motivo, Lote lote) {
+        this.quantidade = quantidade;
+        this.dataRegistro = LocalDateTime.now();
+        this.motivo = motivo;
+        this.lote = lote;
+        if (lote != null) {
+            this.loteId = lote.getIdLote();
+        }
+    }
 
-	public void setIdPerda(Integer idPerda) {
-		this.idPerda = idPerda;
-	}
+    // Construtor para inserção com loteId
+    public Perda(Integer quantidade, String motivo, int loteId) {
+        this.quantidade = quantidade;
+        this.dataRegistro = LocalDateTime.now();
+        this.motivo = motivo;
+        this.loteId = loteId;
+    }
 
-	public Produto getProduto() {
-		return produto;
-	}
+    // Getters e Setters
 
-	public void setProduto(Produto produto) {
-		this.produto = produto;
-	}
+    public int getIdPerda() {
+        return idPerda;
+    }
 
-	public Integer getQuantidade() {
-		return quantidade;
-	}
+    public void setIdPerda(int idPerda) {
+        this.idPerda = idPerda;
+    }
 
-	public void setQuantidade(Integer quantidade) {
-		this.quantidade = quantidade;
-	}
+    public Integer getQuantidade() {
+        return quantidade;
+    }
 
-	public LocalDate getDataVenda() {
-		return dataVenda;
-	}
+    public void setQuantidade(Integer quantidade) {
+        this.quantidade = quantidade;
+    }
 
-	public void setDataVenda(LocalDate dataVenda) {
-		this.dataVenda = dataVenda;
-	}
+    public LocalDateTime getDataRegistro() {
+        return dataRegistro;
+    }
 
-	public LocalDate getDataRegistro() {
-		return dataRegistro;
-	}
+    public void setDataRegistro(LocalDateTime dataRegistro) {
+        this.dataRegistro = dataRegistro;
+    }
 
-	public void setDataRegistro(LocalDate dataRegistro) {
-		this.dataRegistro = dataRegistro;
-	}
+    public String getMotivo() {
+        return motivo;
+    }
 
-	public BigDecimal getPrecoCusto() {
-		return precoCusto;
-	}
+    public void setMotivo(String motivo) {
+        this.motivo = motivo;
+    }
 
-	public void setPrecoCusto(BigDecimal precoCusto) {
-		this.precoCusto = precoCusto;
-	}
+    public int getLoteId() {
+        if (lote != null) {
+            return lote.getIdLote();
+        }
+        return loteId;
+    }
 
-	public BigDecimal getValorPerda() {
-		return valorPerda;
-	}
+    public void setLoteId(int loteId) {
+        this.loteId = loteId;
+    }
 
-	public void setValorPerda(BigDecimal valorPerda) {
-		this.valorPerda = valorPerda;
-	}
+    public Lote getLote() {
+        return lote;
+    }
 
-	public String getMotivo() {
-		return motivo;
-	}
+    public void setLote(Lote lote) {
+        this.lote = lote;
+        if (lote != null) {
+            this.loteId = lote.getIdLote();
+        }
+    }
 
-	public void setMotivo(String motivo) {
-		this.motivo = motivo;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Perda perda = (Perda) o;
+        return idPerda == perda.idPerda;
+    }
 
-	public String getObservacoes() {
-		return observacoes;
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(idPerda);
+    }
 
-	public void setObservacoes(String observacoes) {
-		this.observacoes = observacoes;
-	}
-
-	/**
-	 * Método auxiliar para calcular o valor total da perda automaticamente
-	 * Valor da perda = quantidade * preço de custo
-	 */
-	public void calcularValorPerda() {
-		if (this.quantidade != null && this.precoCusto != null) {
-			this.valorPerda = this.precoCusto.multiply(new BigDecimal(this.quantidade));
-		}
-	}
-
-	/**
-	 * Método auxiliar para obter o número de dias entre a venda e o registro da perda
-	 */
-	public long diasAtePerda() {
-		if (this.dataVenda != null && this.dataRegistro != null) {
-			return java.time.temporal.ChronoUnit.DAYS.between(this.dataVenda, this.dataRegistro);
-		}
-		return 0;
-	}
-
-	//  EQUALS E HASHCODE
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(idPerda);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Perda other = (Perda) obj;
-		return Objects.equals(idPerda, other.idPerda);
-	}
-
-	//  TO STRING 
-
-	@Override
-	public String toString() {
-		return "Perda [idPerda=" + idPerda + ", produto=" + (produto != null ? produto.getNome() : "null")
-				+ ", quantidade=" + quantidade + ", dataVenda=" + dataVenda + ", dataRegistro=" + dataRegistro
-				+ ", precoCusto=" + precoCusto + ", valorPerda=" + valorPerda + ", motivo=" + motivo + "]";
-	}
+    @Override
+    public String toString() {
+        return "Perda{" +
+                "idPerda=" + idPerda +
+                ", quantidade=" + quantidade +
+                ", dataRegistro=" + dataRegistro +
+                ", motivo='" + motivo + '\'' +
+                ", loteId=" + getLoteId() +
+                (lote != null ? ", lote=" + lote.getIdLote() : "") +
+                '}';
+    }
 }

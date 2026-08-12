@@ -1,0 +1,11 @@
+.git
+.gitignore
+.env
+.settings
+.classpath
+.project
+bin/
+target/
+*.bak
+*.md
+docs/

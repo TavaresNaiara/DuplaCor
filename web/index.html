@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dupla Cor — Boutique de Esmaltes de Luxo & Gestão de Estoque FEFO</title>
+  <meta name="description" content="Uma boutique de esmaltes de luxo com gestão inteligente de estoque via lotes, garantindo que você receba sempre produtos perfeitos, frescos e organizados com a precisão de um laboratório.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%239B72CF'/%3E%3Ctext x='16' y='21' text-anchor='middle' fill='white' font-size='14' font-weight='bold' font-family='serif'%3EDC%3C/text%3E%3C/svg%3E">
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Barra Superior de Destaque -->
+  <div class="top-notice-bar">
+    <span class="badge-gold">Algoritmo FEFO Ativo</span>
+    <span>Garantia de frescor com rastreabilidade total de lote e validade na sua esmaltação.</span>
+  </div>
+
+  <!-- Header Principal com Navegação -->
+  <header class="header-main">
+    <div class="nav-container">
+      <div class="brand-logo" onclick="window.location.hash = '#home'">
+        <div class="brand-icon">DC</div>
+        <div class="brand-text">
+          <div class="logo-title">Dupla Cor</div>
+          <div class="logo-subtitle">Esmaltação & Luxo</div>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="#home" class="nav-link active">Início</a></li>
+        <li><a href="#produtos" class="nav-link">Catálogo</a></li>
+        <li><a href="#pedidos" class="nav-link">Meus Pedidos</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <div style="position: relative; display: flex; align-items: center;">
+          <input type="text" id="global-search" placeholder="Buscar esmalte ou marca..." 
+                 style="padding: 8px 16px 8px 36px; border-radius: var(--radius-full); border: 1px solid var(--border-subtle); font-size: 0.85rem; width: 220px; outline: none;">
+          <span style="position: absolute; left: 12px; font-size: 0.9rem; color: var(--text-muted);">🔍</span>
+        </div>
+
+        <button class="btn-icon" onclick="window.location.hash = '#carrinho'" title="Meu Carrinho">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="cart-badge-count">0</span>
+        </button>
+
+        <button class="btn-admin-pill" onclick="window.location.hash = '#admin'">
+          <span>⚙️</span> Painel Admin
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       PÁGINA 1: HOME
+       ========================================================================= -->
+  <main id="page-home" class="page-view active">
+    <div class="container">
+      
+      <!-- Hero Section Glamour -->
+      <section class="hero-glam">
+        <div class="hero-content">
+          <div class="hero-tag">
+            <span>✨</span> Boutique Exclusiva de Esmaltação
+          </div>
+          <h1 class="hero-headline">
+            Cores de luxo com a <span>precisão do frescor</span> em cada lote.
+          </h1>
+          <p class="hero-description">
+            Uma experiência boutique projetada para conectar você aos tons mais cobiçados, com gestão inteligente de estoque que prioriza a validade ideal através do algoritmo <strong>FEFO</strong>.
+          </p>
+          <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <a href="#produtos" class="btn-primary">
+              Explorar Catálogo de Luxo
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="#admin" class="btn-secondary">
+              Ver Painel de Lotes
+            </a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="stat-item">
+              <h4>100%</h4>
+              <p>Rastreável por Lote</p>
+            </div>
+            <div class="stat-item">
+              <h4>FEFO</h4>
+              <p>Giro de Validade Ativo</p>
+            </div>
+            <div class="stat-item">
+              <h4>Pickup</h4>
+              <p>Retirada no Local</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="bottle-glow-card">
+            <div class="fefo-live-pill">🛡️ Algoritmo FEFO Ativo</div>
+            <div style="margin: 20px 0 10px;">
+              <svg class="nail-polish-svg" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg" style="width: 130px; height: 180px;">
+                <defs>
+                  <linearGradient id="hero-grad-cap" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#D4AF37" />
+                    <stop offset="100%" stop-color="#8C7322" />
+                  </linearGradient>
+                  <linearGradient id="hero-grad-bottle" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#B81432" />
+                    <stop offset="70%" stop-color="#660A1B" />
+                    <stop offset="100%" stop-color="#2D0008" />
+                  </linearGradient>
+                </defs>
+                <rect x="38" y="8" width="24" height="42" rx="4" fill="url(#hero-grad-cap)" />
+                <rect x="42" y="50" width="16" height="6" rx="2" fill="#EBDFF5" />
+                <rect x="22" y="56" width="56" height="82" rx="14" fill="url(#hero-grad-bottle)" />
+                <rect x="26" y="60" width="48" height="74" rx="10" fill="url(#glass-shine)" />
+                <path d="M 28 66 Q 36 62 48 62" stroke="rgba(255,255,255,0.6)" stroke-width="3" stroke-linecap="round" fill="none" />
+                <rect x="32" y="84" width="36" height="24" rx="3" fill="rgba(255,255,255,0.92)" />
+                <text x="50" y="96" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-size="7.5" font-weight="bold" fill="#2B1E3A">DUPLA COR</text>
+                <line x1="38" y1="99" x2="62" y2="99" stroke="#9B72CF" stroke-width="0.8" />
+                <text x="50" y="104" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="4.5" font-weight="600" fill="#6E5D82">ED. GLAMOUR</text>
+              </svg>
+            </div>
+            <h3 class="font-serif" style="font-size: 1.5rem; color: var(--primary-dark);">Vermelho Royal</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Lote #1 • Vencimento em 15/10/2026</p>
+            <div style="margin-top: 10px; font-weight: 800; color: var(--primary-dark); font-size: 1.2rem;">
+              R$ 8,90
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categorias em Destaque -->
+      <section style="margin-bottom: 48px;">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Nossas Coleções</h2>
+            <p class="section-subtitle">Selecione o acabamento perfeito para a sua ocasião</p>
+          </div>
+        </div>
+        <div class="category-pills" id="home-category-pills"></div>
+      </section>
+
+      <!-- Vitrine de Esmaltes Disponíveis -->
+      <section style="margin-bottom: 60px;">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Vitrine de Esmaltes</h2>
+            <p class="section-subtitle">Produtos ativos com lotes válidos disponíveis para retirada imediata</p>
+          </div>
+          <a href="#produtos" style="color: var(--primary); font-weight: 700; display: flex; align-items: center; gap: 6px;">
+            Ver todos <span>→</span>
+          </a>
+        </div>
+        <div class="product-grid" id="home-vitrine-grid"></div>
+      </section>
+
+      <!-- Recomendação Inteligente (Bases e Finalizadores) -->
+      <section style="background: var(--bg-alt); border-radius: var(--radius-lg); padding: 40px; border: 1px solid var(--border-subtle); display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; margin-bottom: 48px;">
+        <div>
+          <span class="badge-gold">Motor de Recomendação</span>
+          <h2 class="font-serif" style="font-size: 2.2rem; color: var(--primary-dark); margin: 12px 0;">
+            O Segredo da Esmaltação Duradoura
+          </h2>
+          <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">
+            Nosso motor inteligente sugere a combinação de <strong>Bases Tratativas</strong> e <strong>Top Coats Diamante</strong> com seus esmaltes favoritos para garantir fixação prolongada.
+          </p>
+          <button class="btn-primary" onclick="App.filtrarPorCategoria(3)">Ver Produtos de Tratamento</button>
+        </div>
+        <div style="text-align: center;">
+          <div style="background: #ffffff; padding: 24px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); display: inline-block;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 8px;">COMBO RECOMENDADO</div>
+            <div style="display: flex; gap: 16px; justify-content: center; align-items: center;">
+              <div>💅 Esmalte Cremoso</div>
+              <div style="font-size: 1.2rem; color: var(--primary);">+</div>
+              <div>✨ Base Bomba</div>
+              <div style="font-size: 1.2rem; color: var(--primary);">+</div>
+              <div>💎 Top Coat</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       PÁGINA 2: CATÁLOGO COMPLETO
+       ========================================================================= -->
+  <main id="page-produtos" class="page-view">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Catálogo Completo de Esmaltes</h1>
+          <p class="section-subtitle">Explore todas as cores, marcas e acabamentos da boutique</p>
+        </div>
+      </div>
+
+      <div class="category-pills" id="catalog-category-pills"></div>
+
+      <div class="product-grid" id="catalog-products-grid"></div>
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       PÁGINA 3: CARRINHO PERSISTENTE
+       ========================================================================= -->
+  <main id="page-carrinho" class="page-view">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Meu Carrinho de Compras</h1>
+          <p class="section-subtitle">Itens persistentes vinculados à sua conta com validação de lote</p>
+        </div>
+      </div>
+
+      <div class="cart-layout">
+        <div class="cart-items-box" id="cart-items-container"></div>
+        <div class="cart-summary-card" id="cart-summary-box"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       PÁGINA 4: CHECKOUT & SIMULAÇÃO FEFO
+       ========================================================================= -->
+  <main id="page-checkout" class="page-view">
+    <div class="container" style="max-width: 900px;">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Finalização do Pedido</h1>
+          <p class="section-subtitle">Confirme seus dados e escolha a forma de pagamento</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+        <div style="background: #ffffff; padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+          <h3 class="font-serif" style="font-size: 1.5rem; color: var(--primary-dark); margin-bottom: 16px;">Dados do Cliente</h3>
+          
+          <div style="margin-bottom: 14px;">
+            <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Nome Completo</label>
+            <input type="text" id="chk-nome" value="Maria Silva" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+          </div>
+          
+          <div style="margin-bottom: 14px;">
+            <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">E-mail</label>
+            <input type="email" id="chk-email" value="maria@email.com" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+          </div>
+
+          <h3 class="font-serif" style="font-size: 1.5rem; color: var(--primary-dark); margin: 20px 0 12px;">Forma de Pagamento (Simulação)</h3>
+          
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <label style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); cursor: pointer;">
+              <input type="radio" name="formaPagamento" value="PIX" checked>
+              <span>⚡ <strong>PIX</strong> (Confirmação Imediata)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); cursor: pointer;">
+              <input type="radio" name="formaPagamento" value="CARTAO">
+              <span>💳 <strong>Cartão de Crédito</strong> (Simulação)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); cursor: pointer;">
+              <input type="radio" name="formaPagamento" value="RETIRADA">
+              <span>🏪 <strong>Pagar na Retirada</strong></span>
+            </label>
+          </div>
+
+          <button class="btn-primary" style="width: 100%; margin-top: 24px;" onclick="App.confirmarPedido()">
+            Confirmar e Concluir Pedido
+          </button>
+        </div>
+
+        <div style="background: #ffffff; padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);" id="checkout-review-items">
+          <!-- Preenchido via app.js com simulação de lote FEFO -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       PÁGINA 5: MEUS PEDIDOS
+       ========================================================================= -->
+  <main id="page-pedidos" class="page-view">
+    <div class="container" style="max-width: 900px;">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Histórico de Pedidos</h1>
+          <p class="section-subtitle">Acompanhe suas compras e a rastreabilidade dos lotes despachados</p>
+        </div>
+      </div>
+
+      <div id="pedidos-list-container"></div>
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       PÁGINA 6: PAINEL ADMINISTRATIVO
+       ========================================================================= -->
+  <main id="page-admin" class="page-view">
+    <div class="admin-header-bar">
+      <div class="container" style="padding-top: 0; padding-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h1 class="font-serif" style="font-size: 2.2rem;">Painel de Gestão Dupla Cor</h1>
+          <p style="font-size: 0.88rem; opacity: 0.85;">Controle de Estoque por Lote, Algoritmo FEFO & Auditoria de Perdas</p>
+        </div>
+        <button class="btn-primary" style="background: var(--accent-gold); color: #1a1028;" onclick="App.monitorarValidadeAdmin()">
+          ⚡ Varredura FEFO (Bloquear Vencidos)
+        </button>
+      </div>
+    </div>
+
+    <div class="container" style="padding-top: 0;">
+      <!-- Abas de Navegação Admin -->
+      <div class="admin-nav-tabs">
+        <div class="admin-tab active" data-tab="dashboard">📊 Visão Geral</div>
+        <div class="admin-tab" data-tab="lotes">📦 Lotes & FEFO</div>
+        <div class="admin-tab" data-tab="produtos">💅 Produtos (Catálogo)</div>
+        <div class="admin-tab" data-tab="categorias">🏷️ Categorias</div>
+        <div class="admin-tab" data-tab="perdas">⚠️ Auditoria de Perdas</div>
+        <div class="admin-tab" data-tab="pedidos">🛍️ Pedidos & Vendas</div>
+      </div>
+
+      <!-- Tab: Dashboard -->
+      <div id="admin-tab-dashboard" class="admin-view-content">
+        <div class="kpi-grid" id="admin-kpis-container"></div>
+      </div>
+
+      <!-- Tab: Lotes -->
+      <div id="admin-tab-lotes" class="admin-view-content" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div>
+            <h3 class="font-serif" style="font-size: 1.6rem; color: var(--primary-dark);">Gestão de Lotes em Estoque</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Lotes com menor validade saem primeiro pelo algoritmo FEFO</p>
+          </div>
+          <button class="btn-primary" onclick="App.abrirModalNovoLote()">+ Nova Remessa / Lote</button>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID Lote</th>
+                <th>Produto</th>
+                <th>Qtd Inicial</th>
+                <th>Saldo Atual</th>
+                <th>Data Entrada</th>
+                <th>Data Validade</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="admin-lotes-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Produtos -->
+      <div id="admin-tab-produtos" class="admin-view-content" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 class="font-serif" style="font-size: 1.6rem; color: var(--primary-dark);">Catálogo de Produtos</h3>
+          <button class="btn-primary" onclick="App.abrirModalNovoProduto()">+ Cadastrar Produto</button>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Marca</th>
+                <th>Preço Base</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="admin-produtos-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Categorias -->
+      <div id="admin-tab-categorias" class="admin-view-content" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 class="font-serif" style="font-size: 1.6rem; color: var(--primary-dark);">Categorias</h3>
+          <button class="btn-primary" onclick="App.abrirModalNovaCategoria()">+ Nova Categoria</button>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Descrição</th>
+              </tr>
+            </thead>
+            <tbody id="admin-categorias-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Perdas -->
+      <div id="admin-tab-perdas" class="admin-view-content" style="display: none;">
+        <div style="margin-bottom: 20px;">
+          <h3 class="font-serif" style="font-size: 1.6rem; color: var(--primary-dark);">Auditoria de Perdas e Descarte</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Registro de lotes vencidos bloqueados e descartados</p>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID Perda</th>
+                <th>Lote Afetado</th>
+                <th>Qtd Descartada</th>
+                <th>Motivo</th>
+                <th>Data do Registro</th>
+              </tr>
+            </thead>
+            <tbody id="admin-perdas-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Pedidos -->
+      <div id="admin-tab-pedidos" class="admin-view-content" style="display: none;">
+        <div style="margin-bottom: 20px;">
+          <h3 class="font-serif" style="font-size: 1.6rem; color: var(--primary-dark);">Histórico Geral de Pedidos</h3>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID Pedido</th>
+                <th>Data Venda</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="admin-pedidos-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       MODAIS
+       ========================================================================= -->
+  
+  <!-- Modal Detalhe Produto -->
+  <div class="modal-overlay" id="modal-produto">
+    <div class="modal-card">
+      <button class="modal-close" onclick="App.fecharModais()">✕</button>
+      <div id="modal-produto-content"></div>
+    </div>
+  </div>
+
+  <!-- Modal Sucesso Pedido -->
+  <div class="modal-overlay" id="modal-sucesso-pedido">
+    <div class="modal-card" style="text-align: center; max-width: 480px;">
+      <div style="font-size: 3.5rem; margin-bottom: 12px;">🎉</div>
+      <h2 class="font-serif" style="font-size: 2rem; color: var(--primary-dark);">Pedido Confirmado!</h2>
+      <p style="color: var(--text-muted); margin-bottom: 16px;">
+        Sua compra foi processada com sucesso. O estoque foi reservado respeitando o algoritmo FEFO.
+      </p>
+      <div style="background: var(--bg-alt); padding: 16px; border-radius: var(--radius-sm); margin-bottom: 20px;">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Número do Pedido:</div>
+        <div id="sucesso-pedido-id" style="font-size: 1.6rem; font-weight: 800; color: var(--primary-dark);">#1</div>
+        <div id="sucesso-pedido-total" style="font-weight: 700; color: var(--text-main); margin-top: 4px;">R$ 0,00</div>
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 20px;">
+        📍 <strong>Retirada:</strong> Apresente o código do pedido na loja Dupla Cor para retirada.
+      </p>
+      <button class="btn-primary" style="width: 100%;" onclick="App.fecharModais(); window.location.hash = '#pedidos';">
+        Ver Meus Pedidos
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Novo Lote -->
+  <div class="modal-overlay" id="modal-novo-lote">
+    <div class="modal-card" style="max-width: 500px;">
+      <button class="modal-close" onclick="App.fecharModais()">✕</button>
+      <h3 class="font-serif" style="font-size: 1.8rem; color: var(--primary-dark); margin-bottom: 16px;">Cadastrar Novo Lote</h3>
+      <form onsubmit="App.salvarNovoLote(event)">
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 4px;">Produto Associado</label>
+          <select id="lote-prod-id" required style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+            <option value="1">Vermelho Royal (Risqué)</option>
+            <option value="2">Renda Clássica (Risqué)</option>
+            <option value="3">Base Bomba Fortalecedora (Impala)</option>
+            <option value="4">Preto Sépia (Colorama)</option>
+            <option value="5">Top Coat Brilho Diamante (Dailus)</option>
+            <option value="6">Lavanda Glam Perolado (Dupla Cor)</option>
+            <option value="7">Ouro Champagne Glitter (Dupla Cor)</option>
+          </select>
+        </div>
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 4px;">Quantidade Inicial</label>
+          <input type="number" id="lote-qtd" value="50" min="1" required style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+        </div>
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 4px;">Data de Validade</label>
+          <input type="date" id="lote-dt-val" value="2027-06-30" required style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 4px;">Data de Entrada (Remessa)</label>
+          <input type="date" id="lote-dt-ent" style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%;">Salvar e Integrar ao Estoque</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Novo Produto -->
+  <div class="modal-overlay" id="modal-novo-produto">
+    <div class="modal-card" style="max-width: 500px;">
+      <button class="modal-close" onclick="App.fecharModais()">✕</button>
+      <h3 class="font-serif" style="font-size: 1.8rem; color: var(--primary-dark); margin-bottom: 16px;">Cadastrar Novo Esmalte</h3>
+      <form onsubmit="App.salvarNovoProduto(event)">
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 4px;">Nome do Esmalte</label>
+          <input type="text" id="prod-nome" placeholder="Ex: Rosa Quartzo" required style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+        </div>
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 4px;">Marca</label>
+          <input type="text" id="prod-marca" placeholder="Ex: Dupla Cor / Risqué" required style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 4px;">Preço Base (R$)</label>
+          <input type="number" id="prod-preco" step="0.01" value="9.90" required style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%;">Salvar Produto no Catálogo</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Nova Categoria -->
+  <div class="modal-overlay" id="modal-nova-categoria">
+    <div class="modal-card" style="max-width: 500px;">
+      <button class="modal-close" onclick="App.fecharModais()">✕</button>
+      <h3 class="font-serif" style="font-size: 1.8rem; color: var(--primary-dark); margin-bottom: 16px;">Cadastrar Categoria</h3>
+      <form onsubmit="App.salvarNovaCategoria(event)">
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 4px;">Nome da Categoria</label>
+          <input type="text" id="cat-nome" placeholder="Ex: Metálico" required style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 4px;">Descrição</label>
+          <textarea id="cat-desc" rows="3" placeholder="Descrição do acabamento..." style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);"></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%;">Salvar Categoria</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Descarte / Perda -->
+  <div class="modal-overlay" id="modal-descarte-perda">
+    <div class="modal-card" style="max-width: 500px;">
+      <button class="modal-close" onclick="App.fecharModais()">✕</button>
+      <h3 class="font-serif" style="font-size: 1.8rem; color: var(--status-danger); margin-bottom: 16px;">Registrar Descarte de Lote</h3>
+      <form onsubmit="App.salvarDescarte(event)">
+        <input type="hidden" id="descarte-lote-id">
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 4px;">Quantidade a Descartar</label>
+          <input type="number" id="descarte-quantidade" min="1" required style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 4px;">Motivo da Perda</label>
+          <select id="descarte-motivo" required style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+            <option value="PRODUTO VENCIDO">Produto Vencido (Validade Expirada)</option>
+            <option value="AVARIA">Avaria / Frasco Danificado</option>
+            <option value="QUEBRA">Quebra Acidental</option>
+            <option value="AUDITORIA">Ajuste de Auditoria</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; background: var(--status-danger);">Confirmar Descarte e Baixa</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Container de Toasts -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Footer -->
+  <footer class="footer-main">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="brand-logo" style="margin-bottom: 16px;">
+            <div class="brand-icon">DC</div>
+            <div class="brand-text">
+              <div class="logo-title" style="color: #ffffff;">Dupla Cor</div>
+              <div class="logo-subtitle" style="color: #c9bed9;">Boutique & Esmaltação</div>
+            </div>
+          </div>
+          <p style="font-size: 0.88rem; line-height: 1.5; color: #a99bbd; max-width: 320px;">
+            Gestão inteligente de estoque com rastreabilidade total via algoritmo FEFO. Produtos frescos, perfeitos e organizados com precisão.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Boutique</h4>
+          <ul class="footer-links">
+            <li><a href="#produtos">Catálogo Geral</a></li>
+            <li><a href="#produtos">Esmaltes Cremosos</a></li>
+            <li><a href="#produtos">Tratamento & Base</a></li>
+            <li><a href="#pedidos">Meus Pedidos</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Informações</h4>
+          <ul class="footer-links">
+            <li><a href="#home">Retirada no Local</a></li>
+            <li><a href="#home">Garantia FEFO</a></li>
+            <li><a href="#home">Auditoria de Validade</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Administração</h4>
+          <ul class="footer-links">
+            <li><a href="#admin/dashboard">Visão Geral</a></li>
+            <li><a href="#admin/lotes">Controle de Lotes</a></li>
+            <li><a href="#admin/perdas">Relatório de Perdas</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 Dupla Cor — Sistema de Gestão de Estoque e Venda de Esmaltes. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/fefo.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

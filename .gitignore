@@ -1,1 +1,13 @@
+# Eclipse
 /bin/
+.metadata/
+.settings/
+
+# Maven
+target/
+
+# Ambientes e Segredos
+.env
+
+# Docker / Logs
+*.log
