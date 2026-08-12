@@ -14,7 +14,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD:-duplacor}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-duplacor}
     ports:
-      - "${DB_PORT:-3306}:3306"
+      - "${DB_PORT:-3307}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
@@ -37,7 +37,7 @@ services:
     container_name: duplacor-app
     restart: unless-stopped
     ports:
-      - "${WEB_PORT:-8080}:8080"
+      - "${WEB_PORT:-8088}:8080"
     depends_on:
       mysql:
         condition: service_healthy
