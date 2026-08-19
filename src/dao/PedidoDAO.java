@@ -12,7 +12,7 @@ import java.util.List;
 public class PedidoDAO {
 
     public boolean inserir(Pedido pedido) {
-        String sql = "INSERT INTO Pedido (dataVenda, total, statusPagamento, Usuario_idUsuario) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Pedido (dataVenda, total, statusPagamento, metodoPagamento, Usuario_idUsuario) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -24,7 +24,8 @@ public class PedidoDAO {
 
             stmt.setBigDecimal(2, pedido.getTotal());
             stmt.setString(3, pedido.getStatusPagamento() != null ? pedido.getStatusPagamento() : "APROVADO");
-            stmt.setInt(4, pedido.getUsuarioId());
+            stmt.setString(4, pedido.getMetodoPagamento() != null ? pedido.getMetodoPagamento() : "CARTAO");
+            stmt.setInt(5, pedido.getUsuarioId());
 
             int affected = stmt.executeUpdate();
             if (affected > 0) {
@@ -42,7 +43,7 @@ public class PedidoDAO {
     }
 
     public Pedido buscarPorId(int id) {
-        String sql = "SELECT idPedido, dataVenda, total, statusPagamento, Usuario_idUsuario FROM Pedido WHERE idPedido = ?";
+        String sql = "SELECT idPedido, dataVenda, total, statusPagamento, metodoPagamento, Usuario_idUsuario FROM Pedido WHERE idPedido = ?";
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -60,7 +61,7 @@ public class PedidoDAO {
 
     public List<Pedido> listarTodos() {
         List<Pedido> lista = new ArrayList<>();
-        String sql = "SELECT idPedido, dataVenda, total, statusPagamento, Usuario_idUsuario FROM Pedido ORDER BY dataVenda DESC";
+        String sql = "SELECT idPedido, dataVenda, total, statusPagamento, metodoPagamento, Usuario_idUsuario FROM Pedido ORDER BY dataVenda DESC";
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -76,7 +77,7 @@ public class PedidoDAO {
 
     public List<Pedido> listarPorUsuario(int usuarioId) {
         List<Pedido> lista = new ArrayList<>();
-        String sql = "SELECT idPedido, dataVenda, total, statusPagamento, Usuario_idUsuario FROM Pedido WHERE Usuario_idUsuario = ? ORDER BY dataVenda DESC";
+        String sql = "SELECT idPedido, dataVenda, total, statusPagamento, metodoPagamento, Usuario_idUsuario FROM Pedido WHERE Usuario_idUsuario = ? ORDER BY dataVenda DESC";
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -93,14 +94,15 @@ public class PedidoDAO {
     }
 
     public boolean atualizar(Pedido pedido) {
-        String sql = "UPDATE Pedido SET total = ?, statusPagamento = ?, Usuario_idUsuario = ? WHERE idPedido = ?";
+        String sql = "UPDATE Pedido SET total = ?, statusPagamento = ?, metodoPagamento = ?, Usuario_idUsuario = ? WHERE idPedido = ?";
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setBigDecimal(1, pedido.getTotal());
             stmt.setString(2, pedido.getStatusPagamento());
-            stmt.setInt(3, pedido.getUsuarioId());
-            stmt.setInt(4, pedido.getIdPedido());
+            stmt.setString(3, pedido.getMetodoPagamento());
+            stmt.setInt(4, pedido.getUsuarioId());
+            stmt.setInt(5, pedido.getIdPedido());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -144,6 +146,7 @@ public class PedidoDAO {
                 dataV != null ? dataV.toLocalDateTime() : null,
                 rs.getBigDecimal("total"),
                 rs.getString("statusPagamento"),
+                rs.getString("metodoPagamento"),
                 rs.getInt("Usuario_idUsuario")
         );
     }

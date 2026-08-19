@@ -16,6 +16,7 @@ public class Pedido {
     private LocalDateTime dataVenda;
     private BigDecimal total;
     private String statusPagamento;
+    private String metodoPagamento;
     private int usuarioId;
     private Usuario usuario;
     private List<ItemPedido> itensPedido;
@@ -28,22 +29,24 @@ public class Pedido {
 
     // Construtor com ID (leitura do banco)
     public Pedido(int idPedido, LocalDateTime dataVenda, BigDecimal total,
-                  String statusPagamento, int usuarioId) {
+                  String statusPagamento, String metodoPagamento, int usuarioId) {
         this.idPedido = idPedido;
         this.dataVenda = dataVenda;
         this.total = total;
         this.statusPagamento = statusPagamento;
+        this.metodoPagamento = metodoPagamento;
         this.usuarioId = usuarioId;
         this.itensPedido = new ArrayList<>();
     }
 
     // Construtor completo com Usuario objeto
     public Pedido(int idPedido, LocalDateTime dataVenda, BigDecimal total,
-                  String statusPagamento, Usuario usuario) {
+                  String statusPagamento, String metodoPagamento, Usuario usuario) {
         this.idPedido = idPedido;
         this.dataVenda = dataVenda;
         this.total = total;
         this.statusPagamento = statusPagamento;
+        this.metodoPagamento = metodoPagamento;
         this.usuario = usuario;
         if (usuario != null) {
             this.usuarioId = usuario.getIdUsuario();
@@ -52,10 +55,11 @@ public class Pedido {
     }
 
     // Construtor para inserção (sem ID)
-    public Pedido(BigDecimal total, String statusPagamento, Usuario usuario) {
+    public Pedido(BigDecimal total, String statusPagamento, String metodoPagamento, Usuario usuario) {
         this.dataVenda = LocalDateTime.now();
         this.total = total;
         this.statusPagamento = statusPagamento;
+        this.metodoPagamento = metodoPagamento;
         this.usuario = usuario;
         if (usuario != null) {
             this.usuarioId = usuario.getIdUsuario();
@@ -95,6 +99,14 @@ public class Pedido {
 
     public void setStatusPagamento(String statusPagamento) {
         this.statusPagamento = statusPagamento;
+    }
+
+    public String getMetodoPagamento() {
+        return metodoPagamento;
+    }
+
+    public void setMetodoPagamento(String metodoPagamento) {
+        this.metodoPagamento = metodoPagamento;
     }
 
     public int getUsuarioId() {
@@ -165,6 +177,7 @@ public class Pedido {
                 ", dataVenda=" + dataVenda +
                 ", total=" + total +
                 ", statusPagamento='" + statusPagamento + '\'' +
+                ", metodoPagamento='" + metodoPagamento + '\'' +
                 ", usuarioId=" + getUsuarioId() +
                 (usuario != null ? ", usuario='" + usuario.getNome() + '\'' : "") +
                 ", itens=" + itensPedido.size() +

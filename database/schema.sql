@@ -7,6 +7,11 @@
 CREATE DATABASE IF NOT EXISTS `duplacor` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `duplacor`;
 
+-- Força a sessão a interpretar este script como UTF-8, independentemente do
+-- charset padrão do cliente mysql usado para rodar o import (evita o bug de
+-- "SÃ©pia"/"ClÃ¡ssica" causado por importação com charset errado).
+SET NAMES utf8mb4;
+
 -- Desativar verificação de chaves estrangeiras durante a criação
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -124,6 +129,7 @@ CREATE TABLE IF NOT EXISTS `Pedido` (
     `dataVenda` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
     `total` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     `statusPagamento` VARCHAR(45) NOT NULL DEFAULT 'APROVADO',
+    `metodoPagamento` VARCHAR(45) NULL DEFAULT 'CARTAO',
     `Usuario_idUsuario` INT NOT NULL,
     PRIMARY KEY (`idPedido`),
     INDEX `fk_Pedido_Usuario1_idx` (`Usuario_idUsuario` ASC),
@@ -236,8 +242,8 @@ INSERT INTO `Perda` (`idPerda`, `quantidade`, `dataRegistro`, `motivo`, `Lote_id
 (1, 20, '2026-01-02 08:30:00', 'PRODUTO VENCIDO', 4);
 
 -- Inserir Pedido de exemplo
-INSERT INTO `Pedido` (`idPedido`, `dataVenda`, `total`, `statusPagamento`, `Usuario_idUsuario`) VALUES
-(1, '2026-05-15 14:20:00', 17.80, 'PAGO', 2);
+INSERT INTO `Pedido` (`idPedido`, `dataVenda`, `total`, `statusPagamento`, `metodoPagamento`, `Usuario_idUsuario`) VALUES
+(1, '2026-05-15 14:20:00', 17.80, 'PAGO', 'PIX', 2);
 
 -- Inserir Itens do Pedido (2 unidades do Lote 1 do Vermelho Royal)
 INSERT INTO `ItemPedido` (`idItemPedido`, `quantidade`, `precoAplicado`, `Lote_idLote`, `Pedido_idPedido`) VALUES
