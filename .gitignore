@@ -1,13 +1,42 @@
-# Eclipse
-/bin/
-.metadata/
-.settings/
-
 # Maven
 target/
+*.jar
+*.war
+*.ear
+*.class
 
-# Ambientes e Segredos
+# Eclipse
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Mac
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Outros
+extracted_docx/
+*.bak
 .env
 
-# Docker / Logs
-*.log
+# Documentos
+*.docx
+texts.txt
+document.xml.txt

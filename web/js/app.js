@@ -16,6 +16,7 @@ const App = {
     this.usuarioAtual = ApiClient.getUsuarioAtual();
     this.setupRouter();
     this.setupEventListeners();
+    this.renderNavUser();
     await this.atualizarContadorCarrinho();
     this.navegarPara(window.location.hash || '#home');
   },
@@ -53,10 +54,25 @@ const App = {
         this.mostrarPagina('page-produtos');
         break;
       case '#carrinho':
+        if (this.usuarioAtual && this.usuarioAtual.perfil === 'ADMIN') {
+          this.mostrarToast('O carrinho de compras é exclusivo para clientes.', 'warning');
+          window.location.hash = '#home';
+          break;
+        }
         this.renderCarrinho();
         this.mostrarPagina('page-carrinho');
         break;
       case '#checkout':
+        if (this.usuarioAtual && this.usuarioAtual.perfil === 'ADMIN') {
+          this.mostrarToast('O checkout é exclusivo para clientes.', 'warning');
+          window.location.hash = '#home';
+          break;
+        }
+        if (!this.usuarioAtual) {
+          this.mostrarToast('Por favor, faça login ou crie um perfil para finalizar a compra.', 'warning');
+          window.location.hash = '#login';
+          break;
+        }
         this.renderCheckout();
         this.mostrarPagina('page-checkout');
         break;
@@ -65,35 +81,42 @@ const App = {
         this.mostrarPagina('page-pedidos');
         break;
       case '#login':
+        this.alternarModoAuth('login');
         this.mostrarPagina('page-login');
         break;
       case '#admin':
       case '#admin/dashboard':
+        if (!this.exigirAdmin()) break;
         this.renderAdminDashboard();
         this.mostrarPagina('page-admin');
         this.setAdminTab('dashboard');
         break;
       case '#admin/lotes':
+        if (!this.exigirAdmin()) break;
         this.renderAdminLotes();
         this.mostrarPagina('page-admin');
         this.setAdminTab('lotes');
         break;
       case '#admin/produtos':
+        if (!this.exigirAdmin()) break;
         this.renderAdminProdutos();
         this.mostrarPagina('page-admin');
         this.setAdminTab('produtos');
         break;
       case '#admin/categorias':
+        if (!this.exigirAdmin()) break;
         this.renderAdminCategorias();
         this.mostrarPagina('page-admin');
         this.setAdminTab('categorias');
         break;
       case '#admin/perdas':
+        if (!this.exigirAdmin()) break;
         this.renderAdminPerdas();
         this.mostrarPagina('page-admin');
         this.setAdminTab('perdas');
         break;
       case '#admin/pedidos':
+        if (!this.exigirAdmin()) break;
         this.renderAdminPedidos();
         this.mostrarPagina('page-admin');
         this.setAdminTab('pedidos');
@@ -116,8 +139,10 @@ const App = {
     const searchInput = document.getElementById('global-search');
     if (searchInput) {
       searchInput.addEventListener('input', (e) => {
-        this.termoBusca = e.target.value.toLowerCase();
-        if (window.location.hash === '#produtos') {
+        this.termoBusca = e.target.value.toLowerCase().trim();
+        if (window.location.hash !== '#produtos') {
+          window.location.hash = '#produtos';
+        } else {
           this.renderCatalogo();
         }
       });
@@ -133,20 +158,266 @@ const App = {
   },
 
   // =========================================================================
+  // AUTENTICAÇÃO & PERFIL DO USUÁRIO
+  // =========================================================================
+  renderNavUser() {
+    const container = document.getElementById('nav-user-area');
+    const adminBtn = document.getElementById('nav-admin-btn');
+    const heroAdminBtn = document.getElementById('hero-admin-btn');
+    if (!container) return;
+
+    const cartBtn = document.getElementById('nav-cart-btn');
+
+    if (this.usuarioAtual) {
+      const primeiroNome = (this.usuarioAtual.nome || 'Cliente').split(' ')[0];
+      container.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary-dark);">Olá, ${primeiroNome}</span>
+          <button class="btn-icon" title="Sair da conta" onclick="App.logout()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          </button>
+        </div>
+      `;
+      if (adminBtn) adminBtn.style.display = (this.usuarioAtual.perfil === 'ADMIN') ? 'inline-flex' : 'none';
+      if (heroAdminBtn) heroAdminBtn.style.display = (this.usuarioAtual.perfil === 'ADMIN') ? 'inline-flex' : 'none';
+      if (cartBtn) cartBtn.style.display = (this.usuarioAtual.perfil === 'ADMIN') ? 'none' : 'inline-flex';
+    } else {
+      container.innerHTML = `
+        <a href="#login" class="btn-secondary" style="padding: 8px 18px; font-size: 0.85rem;">Entrar</a>
+      `;
+      if (adminBtn) adminBtn.style.display = 'none';
+      if (heroAdminBtn) heroAdminBtn.style.display = 'none';
+      if (cartBtn) cartBtn.style.display = 'inline-flex';
+    }
+  },
+
+  exigirAdmin() {
+    if (this.usuarioAtual && this.usuarioAtual.perfil === 'ADMIN') {
+      return true;
+    }
+    this.mostrarToast('Acesso restrito. Faça login com uma conta de administrador.', 'error');
+    window.location.hash = '#login';
+    return false;
+  },
+
+  alternarModoAuth(modo) {
+    const formLogin = document.getElementById('form-login');
+    const formCadastro = document.getElementById('form-cadastro');
+    const formRecuperar = document.getElementById('form-recuperar-senha');
+    const tabLogin = document.getElementById('auth-tab-login');
+    const tabCadastro = document.getElementById('auth-tab-cadastro');
+    if (!formLogin || !formCadastro) return;
+
+    formLogin.style.display = modo === 'login' ? 'block' : 'none';
+    formCadastro.style.display = modo === 'cadastro' ? 'block' : 'none';
+    if (formRecuperar) formRecuperar.style.display = modo === 'recuperar' ? 'block' : 'none';
+
+    const ehLogin = modo === 'login';
+    const ehCadastro = modo === 'cadastro';
+    if (tabLogin && tabCadastro) {
+      tabLogin.style.background = ehLogin ? '#ffffff' : 'transparent';
+      tabLogin.style.boxShadow = ehLogin ? 'var(--shadow-sm)' : 'none';
+      tabLogin.style.color = ehLogin ? 'var(--text-main)' : 'var(--text-muted)';
+      tabCadastro.style.background = ehCadastro ? '#ffffff' : 'transparent';
+      tabCadastro.style.boxShadow = ehCadastro ? 'var(--shadow-sm)' : 'none';
+      tabCadastro.style.color = ehCadastro ? 'var(--text-main)' : 'var(--text-muted)';
+    }
+
+    const erroLogin = document.getElementById('login-erro');
+    const erroCadastro = document.getElementById('cadastro-erro');
+    if (erroLogin) erroLogin.style.display = 'none';
+    if (erroCadastro) erroCadastro.style.display = 'none';
+  },
+
+  abrirRecuperarSenha() {
+    const erroBox = document.getElementById('recuperar-erro');
+    const sucessoBox = document.getElementById('recuperar-sucesso');
+    if (erroBox) erroBox.style.display = 'none';
+    if (sucessoBox) sucessoBox.style.display = 'none';
+    this.alternarModoAuth('recuperar');
+  },
+
+  async submitRecuperarSenha(e) {
+    e.preventDefault();
+    const email = document.getElementById('recuperar-email').value.trim();
+    const erroBox = document.getElementById('recuperar-erro');
+    const sucessoBox = document.getElementById('recuperar-sucesso');
+    erroBox.style.display = 'none';
+    sucessoBox.style.display = 'none';
+
+    const resultado = await ApiClient.recuperarSenha(email);
+    if (resultado.sucesso) {
+      sucessoBox.textContent = `Nova senha gerada: ${resultado.novaSenha} — use-a para entrar (em um ambiente real, isso seria enviado por e-mail).`;
+      sucessoBox.style.display = 'block';
+    } else {
+      erroBox.textContent = resultado.mensagem || 'Não foi possível recuperar a senha.';
+      erroBox.style.display = 'block';
+    }
+  },
+
+  async submitLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    const senha = document.getElementById('login-senha').value;
+    const erroBox = document.getElementById('login-erro');
+
+    const usuario = await ApiClient.login(email, senha);
+    if (usuario) {
+      this.usuarioAtual = usuario;
+      this.renderNavUser();
+      await this.atualizarContadorCarrinho();
+      this.mostrarToast(`Bem-vinda de volta, ${usuario.nome.split(' ')[0]}!`, 'success');
+      window.location.hash = usuario.perfil === 'ADMIN' ? '#admin' : '#home';
+    } else if (erroBox) {
+      erroBox.textContent = 'E-mail ou senha inválidos. Tente novamente.';
+      erroBox.style.display = 'block';
+    }
+  },
+
+  async submitCadastro(e) {
+    e.preventDefault();
+    const nome = document.getElementById('cadastro-nome').value.trim();
+    const email = document.getElementById('cadastro-email').value.trim();
+    const senha = document.getElementById('cadastro-senha').value;
+    const erroBox = document.getElementById('cadastro-erro');
+
+    const resultado = await ApiClient.cadastro(nome, email, senha);
+    if (resultado.sucesso) {
+      this.usuarioAtual = resultado.usuario;
+      this.renderNavUser();
+      await this.atualizarContadorCarrinho();
+      this.mostrarToast(`Conta criada com sucesso! Bem-vinda, ${nome.split(' ')[0]}!`, 'success');
+      window.location.hash = '#home';
+    } else if (erroBox) {
+      erroBox.textContent = resultado.mensagem || 'Não foi possível concluir o cadastro.';
+      erroBox.style.display = 'block';
+    }
+  },
+
+  logout() {
+    ApiClient.logout();
+    this.usuarioAtual = null;
+    this.renderNavUser();
+    this.atualizarContadorCarrinho();
+    this.mostrarToast('Você saiu da sua conta.', 'info');
+    window.location.hash = '#home';
+  },
+
+  // Usado pelos links do rodapé para filtrar o catálogo por categoria pelo nome
+  async irParaCategoria(nomeCategoria) {
+    if (!nomeCategoria) {
+      this.categoriaFiltro = null;
+    } else {
+      const categorias = await ApiClient.getCategorias();
+      const cat = categorias.find(c => c.nome.toLowerCase() === nomeCategoria.toLowerCase());
+      this.categoriaFiltro = cat ? cat.idCategoria : null;
+    }
+    if (window.location.hash === '#produtos') {
+      this.renderCatalogo();
+    } else {
+      window.location.hash = '#produtos';
+    }
+  },
+
+  // Modal informativo simples para os links institucionais do rodapé
+  mostrarInfoInstitucional(chave) {
+    const conteudos = {
+      retirada: {
+        titulo: '📍 Retirada no Local',
+        texto: 'Seu pedido fica pronto para retirada na nossa loja física em até 24h após a confirmação do pagamento. Você recebe uma notificação assim que estiver disponível — sem taxas de entrega e sem espera.'
+      },
+      fefo: {
+        titulo: '🛡️ Garantia FEFO',
+        texto: 'Utilizamos o método FEFO (First Expire, First Out): a cada compra, o sistema aloca automaticamente os lotes com validade mais próxima primeiro. Isso garante que nenhum produto vencido chegue até você e que o estoque seja sempre girado da forma mais eficiente.'
+      },
+      auditoria: {
+        titulo: '🔍 Auditoria de Validade',
+        texto: 'Todo lote cadastrado é monitorado continuamente pelo nosso sistema. Produtos que atingem a data de validade são automaticamente bloqueados para venda e registrados como perda, com rastreabilidade completa de quantidade, motivo e data — disponível no Painel Administrativo.'
+      }
+    };
+    const dados = conteudos[chave];
+    if (!dados) return;
+    document.getElementById('info-institucional-titulo').textContent = dados.titulo;
+    document.getElementById('info-institucional-texto').textContent = dados.texto;
+    document.getElementById('modal-info-institucional').classList.add('active');
+  },
+
+  // =========================================================================
   // 1. TELA: HOME (Vitrine Glamour + Destaques FEFO)
   // =========================================================================
   async renderHome() {
     await this.renderCategoriasHome();
     const vitrine = await ApiClient.getVitrine();
     const container = document.getElementById('home-vitrine-grid');
+    if (container) {
+      if (vitrine.length === 0) {
+        container.innerHTML = `<div class="empty-msg">Nenhum esmalte com lote disponível no momento.</div>`;
+      } else {
+        container.innerHTML = vitrine.slice(0, 4).map(prod => this.criarCardProdutoHTML(prod)).join('');
+      }
+    }
+    await this.renderRecomendacoes();
+  },
+
+  // Motor de Recomendação: analisa as categorias já compradas pela usuária e sugere
+  // produtos ativos das mesmas categorias que ela ainda não tem. Sem histórico
+  // suficiente (ou visitante não logado), cai no fallback de produtos de Tratamento & Base.
+  async renderRecomendacoes() {
+    const container = document.getElementById('home-recomendacoes-grid');
+    const tituloEl = document.getElementById('home-recomendacoes-titulo');
+    const subEl = document.getElementById('home-recomendacoes-sub');
     if (!container) return;
 
-    if (vitrine.length === 0) {
-      container.innerHTML = `<div class="empty-msg">Nenhum esmalte com lote disponível no momento.</div>`;
-      return;
+    const produtos = await ApiClient.getProdutos();
+    let recomendados = [];
+    let personalizado = false;
+
+    if (this.usuarioAtual) {
+      const pedidos = await ApiClient.getPedidos(this.usuarioAtual.idUsuario);
+      if (pedidos.length > 0) {
+        const nomesComprados = new Set();
+        pedidos.forEach(p => (p.itens || []).forEach(it => nomesComprados.add(it.produtoNome)));
+
+        const categoriasCompradas = new Set();
+        produtos.forEach(p => {
+          if (nomesComprados.has(p.nome)) {
+            (p.categorias || []).forEach(catId => categoriasCompradas.add(catId));
+          }
+        });
+
+        recomendados = produtos.filter(p =>
+          p.status === 'ATIVO' &&
+          !nomesComprados.has(p.nome) &&
+          p.categorias && p.categorias.some(c => categoriasCompradas.has(c))
+        );
+        personalizado = recomendados.length > 0;
+      }
     }
 
-    container.innerHTML = vitrine.slice(0, 4).map(prod => this.criarCardProdutoHTML(prod)).join('');
+    if (recomendados.length === 0) {
+      const categorias = await ApiClient.getCategorias();
+      const catTratamento = categorias.find(c => c.nome.toLowerCase().includes('tratamento'));
+      recomendados = produtos.filter(p =>
+        p.status === 'ATIVO' && catTratamento && p.categorias && p.categorias.includes(catTratamento.idCategoria)
+      );
+    }
+
+    if (tituloEl && subEl) {
+      if (personalizado) {
+        tituloEl.textContent = `Selecionado para você, ${this.usuarioAtual.nome.split(' ')[0]}`;
+        subEl.textContent = 'Combinações baseadas no que você já comprou';
+      } else if (this.usuarioAtual) {
+        tituloEl.textContent = 'O Segredo da Esmaltação Duradoura';
+        subEl.textContent = 'Continue comprando para receber recomendações cada vez mais personalizadas';
+      } else {
+        tituloEl.textContent = 'O Segredo da Esmaltação Duradoura';
+        subEl.textContent = 'Faça login para ver sugestões personalizadas com base no seu histórico de compras';
+      }
+    }
+
+    container.innerHTML = recomendados.length > 0
+      ? recomendados.slice(0, 4).map(prod => this.criarCardProdutoHTML(prod)).join('')
+      : `<p style="color: var(--text-muted); grid-column: 1/-1;">Nenhuma sugestão disponível no momento.</p>`;
   },
 
   async renderCategoriasHome() {
@@ -251,9 +522,11 @@ const App = {
         <h4 class="product-name" onclick="App.abrirModalProduto(${prod.idProduto})" style="cursor: pointer;">${prod.nome}</h4>
         <div class="product-price-row">
           <div class="product-price">R$ ${prod.precoBase.toFixed(2).replace('.', ',')}</div>
+          ${(this.usuarioAtual && this.usuarioAtual.perfil === 'ADMIN') ? '' : `
           <button class="btn-add-cart" title="Adicionar ao Carrinho" onclick="App.adicionarAoCarrinho(${prod.idProduto})">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
           </button>
+          `}
         </div>
       </div>
     `;
@@ -327,10 +600,12 @@ const App = {
       </div>
       ${lotesHtml}
       <div style="display: flex; gap: 12px; margin-top: 20px;">
+        ${(this.usuarioAtual && this.usuarioAtual.perfil === 'ADMIN') ? '' : `
         <button class="btn-primary" style="flex: 1;" onclick="App.adicionarAoCarrinho(${prod.idProduto}); App.fecharModais();">
           Adicionar ao Carrinho
         </button>
-        <button class="btn-secondary" onclick="App.fecharModais()">Fechar</button>
+        `}
+        <button class="btn-secondary" style="flex: ${(this.usuarioAtual && this.usuarioAtual.perfil === 'ADMIN') ? '1' : 'none'};" onclick="App.fecharModais()">Fechar</button>
       </div>
     `;
 
@@ -345,7 +620,19 @@ const App = {
   // 4. CARRINHO PERSISTENTE
   // =========================================================================
   async adicionarAoCarrinho(produtoId) {
-    const user = this.usuarioAtual || { idUsuario: 2 };
+    const user = this.usuarioAtual;
+    if (!user) {
+      this.fecharModais();
+      this.mostrarToast('Por favor, faça login ou crie um perfil para adicionar produtos ao carrinho.', 'warning');
+      window.location.hash = '#login';
+      this.navegarPara('#login');
+      return;
+    }
+    if (user.perfil === 'ADMIN') {
+      this.mostrarToast('Administradores não podem adicionar produtos ao carrinho.', 'error');
+      return;
+    }
+
     await ApiClient.adicionarAoCarrinho(user.idUsuario, produtoId, 1);
     await this.atualizarContadorCarrinho();
     this.mostrarToast('Esmalte adicionado ao carrinho com sucesso!', 'success');
@@ -361,7 +648,9 @@ const App = {
   },
 
   async renderCarrinho() {
-    const user = this.usuarioAtual || { idUsuario: 2 };
+    const user = this.usuarioAtual;
+    if (!user) return;
+
     const itens = await ApiClient.getCarrinho(user.idUsuario);
     const container = document.getElementById('cart-items-container');
     const summaryContainer = document.getElementById('cart-summary-box');
@@ -457,7 +746,9 @@ const App = {
   // 5. CHECKOUT & SIMULAÇÃO FEFO
   // =========================================================================
   async renderCheckout() {
-    const user = this.usuarioAtual || { idUsuario: 2, nome: 'Maria Silva', email: 'maria@email.com' };
+    const user = this.usuarioAtual;
+    if (!user) return;
+
     const itens = await ApiClient.getCarrinho(user.idUsuario);
     const container = document.getElementById('checkout-review-items');
     if (!container) return;
@@ -466,6 +757,12 @@ const App = {
       window.location.hash = '#carrinho';
       return;
     }
+
+    const inputNome = document.getElementById('chk-nome');
+    const inputEmail = document.getElementById('chk-email');
+    if (inputNome) inputNome.value = '';
+    if (inputEmail) inputEmail.value = '';
+
 
     let total = 0;
     let fefoPreviewHtml = '';
@@ -595,6 +892,104 @@ const App = {
     });
   },
 
+  // =========================================================================
+  // RELATÓRIOS: EXPORTAÇÃO CSV & IMPRESSÃO
+  // =========================================================================
+  exportarCSV(linhas, colunas, nomeArquivo) {
+    const cabecalho = colunas.map(c => c.header).join(';');
+    const corpo = linhas.map(item => {
+      return colunas.map(c => {
+        let valor = typeof c.value === 'function' ? c.value(item) : item[c.key];
+        valor = (valor === null || valor === undefined) ? '' : String(valor);
+        valor = valor.replace(/"/g, '""');
+        return /[;"\n]/.test(valor) ? `"${valor}"` : valor;
+      }).join(';');
+    });
+    // BOM (\uFEFF) garante que o Excel reconheça acentuação corretamente
+    const csv = '\uFEFF' + [cabecalho, ...corpo].join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nomeArquivo;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    this.mostrarToast('Arquivo CSV exportado com sucesso!', 'success');
+  },
+
+  async exportarLotesCSV() {
+    const lotes = await ApiClient.getLotes();
+    const produtos = await ApiClient.getProdutos();
+    this.exportarCSV(lotes, [
+      { header: 'ID Lote', key: 'idLote' },
+      { header: 'Produto', value: l => (produtos.find(p => p.idProduto === l.Produto_idProduto) || {}).nome || '' },
+      { header: 'Qtd Inicial', key: 'quantInicial' },
+      { header: 'Saldo Atual', key: 'quantAtual' },
+      { header: 'Data Entrada', key: 'dataEntrada' },
+      { header: 'Data Validade', key: 'dataValidade' },
+      { header: 'Status', key: 'status' }
+    ], 'duplacor_lotes.csv');
+  },
+
+  async exportarProdutosCSV() {
+    const produtos = await ApiClient.getProdutos();
+    this.exportarCSV(produtos, [
+      { header: 'ID', key: 'idProduto' },
+      { header: 'Nome', key: 'nome' },
+      { header: 'Marca', key: 'marca' },
+      { header: 'Preço Base', value: p => p.precoBase.toFixed(2).replace('.', ',') },
+      { header: 'Status', key: 'status' }
+    ], 'duplacor_produtos.csv');
+  },
+
+  async exportarPerdasCSV() {
+    const perdas = await ApiClient.getPerdas();
+    this.exportarCSV(perdas, [
+      { header: 'ID Perda', key: 'idPerda' },
+      { header: 'Lote', value: p => `#${p.Lote_idLote}` },
+      { header: 'Quantidade', key: 'quantidade' },
+      { header: 'Motivo', key: 'motivo' },
+      { header: 'Data Registro', key: 'dataRegistro' }
+    ], 'duplacor_perdas.csv');
+  },
+
+  async exportarPedidosCSV() {
+    const pedidos = await ApiClient.getPedidos();
+    this.exportarCSV(pedidos, [
+      { header: 'ID Pedido', key: 'idPedido' },
+      { header: 'Data Venda', key: 'dataVenda' },
+      { header: 'Cliente', value: p => `#${p.Usuario_idUsuario}` },
+      { header: 'Total', value: p => p.total.toFixed(2).replace('.', ',') },
+      { header: 'Status Pagamento', key: 'statusPagamento' }
+    ], 'duplacor_pedidos.csv');
+  },
+
+  async exportarDashboardCSV() {
+    const produtos = await ApiClient.getProdutos();
+    const lotes = await ApiClient.getLotes();
+    const perdas = await ApiClient.getPerdas();
+    const pedidos = await ApiClient.getPedidos();
+    const lotesVencidos = lotes.filter(l => FefoEngine.isLoteVencido(l.dataValidade));
+    const lotesAtivos = lotes.filter(l => !FefoEngine.isLoteVencido(l.dataValidade) && l.quantAtual > 0);
+    const totalVendas = pedidos.reduce((acc, p) => acc + (p.total || 0), 0);
+    const totalPerdas = perdas.reduce((acc, p) => acc + (p.quantidade || 0), 0);
+
+    const resumo = [
+      { indicador: 'Total de Produtos Cadastrados', valor: produtos.length },
+      { indicador: 'Lotes Ativos (disponíveis)', valor: lotesAtivos.length },
+      { indicador: 'Lotes Vencidos/Bloqueados', valor: lotesVencidos.length },
+      { indicador: 'Total de Pedidos', valor: pedidos.length },
+      { indicador: 'Total Faturado (R$)', valor: totalVendas.toFixed(2).replace('.', ',') },
+      { indicador: 'Total de Unidades Perdidas', valor: totalPerdas }
+    ];
+    this.exportarCSV(resumo, [
+      { header: 'Indicador', key: 'indicador' },
+      { header: 'Valor', key: 'valor' }
+    ], 'duplacor_dashboard_resumo.csv');
+  },
+
   async renderAdminDashboard() {
     const produtos = await ApiClient.getProdutos();
     const lotes = await ApiClient.getLotes();
@@ -629,6 +1024,34 @@ const App = {
           <div style="font-size: 0.75rem; color: var(--text-muted);">${pedidos.length} pedidos realizados</div>
         </div>
       `;
+    }
+
+    // Relatório de Vendas por Produto (item 8 do escopo)
+    const vendasTbody = document.getElementById('admin-relatorio-vendas-tbody');
+    if (vendasTbody) {
+      const vendas = (await ApiClient.getRelatorioVendas()).filter(v => v.quantidadeVendida > 0);
+      vendasTbody.innerHTML = vendas.length > 0
+        ? vendas.map(v => `
+            <tr>
+              <td>${v.nome}${v.marca ? ` <span style="color: var(--text-muted); font-size: 0.8em;">(${v.marca})</span>` : ''}</td>
+              <td>${v.quantidadeVendida}</td>
+              <td>R$ ${Number(v.faturamento).toFixed(2).replace('.', ',')}</td>
+            </tr>`).join('')
+        : '<tr><td colspan="3" style="text-align:center; color: var(--text-muted);">Nenhuma venda registrada ainda</td></tr>';
+    }
+
+    // Análise de Consumo por Categoria (item 8 do escopo)
+    const consumoTbody = document.getElementById('admin-relatorio-consumo-tbody');
+    if (consumoTbody) {
+      const consumo = (await ApiClient.getRelatorioConsumo()).filter(c => c.quantidadeVendida > 0);
+      consumoTbody.innerHTML = consumo.length > 0
+        ? consumo.map(c => `
+            <tr>
+              <td>${c.nome}</td>
+              <td>${c.quantidadeVendida}</td>
+              <td>R$ ${Number(c.faturamento).toFixed(2).replace('.', ',')}</td>
+            </tr>`).join('')
+        : '<tr><td colspan="3" style="text-align:center; color: var(--text-muted);">Nenhum consumo registrado ainda</td></tr>';
     }
   },
 

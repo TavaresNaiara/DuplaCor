@@ -80,7 +80,14 @@ public class UsuarioController {
         return usuarioDAO.listarTodos();
     }
 
-    public boolean atualizar(int id, String nome, String email, String senha, String perfil) {
+    /**
+     * Atualiza dados cadastrais do usuário.
+     *
+     * Regra de negócio do escopo: a senha NUNCA é editada por aqui. A única forma
+     * de alterar a senha é via {@link #recuperarSenha(String)}, que gera uma nova
+     * senha aleatória e a envia para o e-mail cadastrado.
+     */
+    public boolean atualizar(int id, String nome, String email, String perfil) {
         Usuario existente = usuarioDAO.buscarPorId(id);
         if (existente == null) {
             System.err.println("Erro: Usuário com ID " + id + " não encontrado.");
@@ -92,9 +99,6 @@ public class UsuarioController {
         }
         if (email != null && email.contains("@")) {
             existente.setEmail(email.trim());
-        }
-        if (senha != null && senha.trim().length() >= 4) {
-            existente.setSenha(senha.trim());
         }
         if (perfil != null && !perfil.trim().isEmpty()) {
             existente.setPerfil(perfil.trim().toUpperCase());

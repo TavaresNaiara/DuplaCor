@@ -1,6 +1,7 @@
 /**
  * DUPLA COR - CLIENTE DE COMUNICAÇÃO COM API REST & PERSISTÊNCIA LOCAL
- * Comunica-se com o backend Java (porta 8080) e mantém sincronização local de fallback.
+ * Comunica-se com o backend Java (porta 8080) e mantém sincronização local de fallback
+ * para quando o backend/MySQL estiver indisponível (modo offline de demonstração).
  */
 
 const ApiClient = {
@@ -76,6 +77,8 @@ const ApiClient = {
     localStorage.setItem('duplacor_db', JSON.stringify(this.mockData));
   },
 
+  // Requisição "silenciosa": em caso de falha (backend offline OU resposta de erro),
+  // retorna null e quem chamou decide se cai no fallback local.
   async request(endpoint, options = {}) {
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
@@ -83,7 +86,9 @@ const ApiClient = {
         ...options
       });
       if (response.ok) {
-        return await response.json();
+        // Respostas 204/sem corpo não quebram o parse
+        const texto = await response.text();
+        return texto ? JSON.parse(texto) : { sucesso: true };
       }
     } catch (e) {
       // Backend offline: o fallback local assumirá a resposta
@@ -119,7 +124,16 @@ const ApiClient = {
   },
 
   async salvarProduto(produto) {
-    if (produto.idProduto) {
+    const isEdicao = !!produto.idProduto;
+    const endpoint = isEdicao ? `/produtos/${produto.idProduto}` : '/produtos';
+    const apiRes = await this.request(endpoint, {
+      method: isEdicao ? 'PUT' : 'POST',
+      body: JSON.stringify(produto)
+    });
+    if (apiRes) return apiRes;
+
+    // Fallback local (backend indisponível)
+    if (isEdicao) {
       const index = this.mockData.produtos.findIndex(p => p.idProduto === produto.idProduto);
       if (index !== -1) {
         this.mockData.produtos[index] = { ...this.mockData.produtos[index], ...produto };
@@ -136,6 +150,9 @@ const ApiClient = {
   },
 
   async excluirProduto(id) {
+    const apiRes = await this.request(`/produtos/${id}`, { method: 'DELETE' });
+    if (apiRes) return true;
+
     this.mockData.produtos = this.mockData.produtos.filter(p => p.idProduto !== Number(id));
     this.saveLocal();
     return true;
@@ -151,7 +168,16 @@ const ApiClient = {
   },
 
   async salvarCategoria(cat) {
-    if (cat.idCategoria) {
+    const isEdicao = !!cat.idCategoria;
+    const endpoint = isEdicao ? `/categorias/${cat.idCategoria}` : '/categorias';
+    const apiRes = await this.request(endpoint, {
+      method: isEdicao ? 'PUT' : 'POST',
+      body: JSON.stringify(cat)
+    });
+    if (apiRes) return apiRes;
+
+    // Fallback local
+    if (isEdicao) {
       const index = this.mockData.categorias.findIndex(c => c.idCategoria === cat.idCategoria);
       if (index !== -1) {
         this.mockData.categorias[index] = { ...this.mockData.categorias[index], ...cat };
@@ -177,12 +203,23 @@ const ApiClient = {
   },
 
   async getLotesPorProduto(produtoId) {
+    const apiRes = await this.request(`/lotes?produtoId=${produtoId}`);
+    if (apiRes) return apiRes;
     const lotes = await this.getLotes();
     return lotes.filter(l => l.Produto_idProduto === Number(produtoId));
   },
 
   async salvarLote(lote) {
-    if (lote.idLote) {
+    const isEdicao = !!lote.idLote;
+    const endpoint = isEdicao ? `/lotes/${lote.idLote}` : '/lotes';
+    const apiRes = await this.request(endpoint, {
+      method: isEdicao ? 'PUT' : 'POST',
+      body: JSON.stringify(lote)
+    });
+    if (apiRes) return apiRes;
+
+    // Fallback local
+    if (isEdicao) {
       const index = this.mockData.lotes.findIndex(l => l.idLote === lote.idLote);
       if (index !== -1) {
         this.mockData.lotes[index] = { ...this.mockData.lotes[index], ...lote };
@@ -204,6 +241,10 @@ const ApiClient = {
   },
 
   async monitorarVencidos() {
+    const apiRes = await this.request('/lotes/monitorar', { method: 'POST' });
+    if (apiRes) return apiRes.bloqueados ?? 0;
+
+    // Fallback local
     let count = 0;
     this.mockData.lotes.forEach(l => {
       if (FefoEngine.isLoteVencido(l.dataValidade) && l.status !== 'VENCIDO') {
@@ -230,6 +271,13 @@ const ApiClient = {
   },
 
   async adicionarAoCarrinho(usuarioId, produtoId, quantidade = 1) {
+    const apiRes = await this.request('/carrinho', {
+      method: 'POST',
+      body: JSON.stringify({ usuarioId: Number(usuarioId), produtoId: Number(produtoId), quantidade })
+    });
+    if (apiRes) return true;
+
+    // Fallback local
     const existente = this.mockData.carrinho.find(
       c => c.Usuario_idUsuario === Number(usuarioId) && c.Produto_idProduto === Number(produtoId)
     );
@@ -253,6 +301,14 @@ const ApiClient = {
     if (novaQtd <= 0) {
       return this.removerDoCarrinho(idItem);
     }
+
+    const apiRes = await this.request(`/carrinho/${idItem}`, {
+      method: 'PUT',
+      body: JSON.stringify({ quantidade: novaQtd })
+    });
+    if (apiRes) return true;
+
+    // Fallback local
     const item = this.mockData.carrinho.find(c => c.idUsuarioCarrinho === Number(idItem));
     if (item) {
       item.quantidade = novaQtd;
@@ -263,12 +319,17 @@ const ApiClient = {
   },
 
   async removerDoCarrinho(idItem) {
+    const apiRes = await this.request(`/carrinho/${idItem}`, { method: 'DELETE' });
+    if (apiRes) return true;
+
     this.mockData.carrinho = this.mockData.carrinho.filter(c => c.idUsuarioCarrinho !== Number(idItem));
     this.saveLocal();
     return true;
   },
 
   async limparCarrinho(usuarioId) {
+    // O backend já limpa o carrinho automaticamente ao finalizar o pedido (finalizarCompraDoCarrinho).
+    // Mantido apenas para o fluxo 100% local (offline).
     this.mockData.carrinho = this.mockData.carrinho.filter(c => c.Usuario_idUsuario !== Number(usuarioId));
     this.saveLocal();
     return true;
@@ -287,6 +348,13 @@ const ApiClient = {
   },
 
   async finalizarPedido(usuarioId, statusPagamento = 'PAGO') {
+    const apiRes = await this.request('/pedidos', {
+      method: 'POST',
+      body: JSON.stringify({ usuarioId: Number(usuarioId), statusPagamento })
+    });
+    if (apiRes) return apiRes;
+
+    // Fallback local (checkout simulado 100% no navegador)
     const itensCarrinho = await this.getCarrinho(usuarioId);
     if (itensCarrinho.length === 0) return null;
 
@@ -348,6 +416,13 @@ const ApiClient = {
   },
 
   async registrarPerda(loteId, quantidade, motivo) {
+    const apiRes = await this.request('/perdas', {
+      method: 'POST',
+      body: JSON.stringify({ loteId: Number(loteId), quantidade, motivo: (motivo || '').toUpperCase() })
+    });
+    if (apiRes) return apiRes;
+
+    // Fallback local
     const lote = this.mockData.lotes.find(l => l.idLote === Number(loteId));
     if (!lote || lote.quantAtual < quantidade) return false;
 
@@ -371,9 +446,115 @@ const ApiClient = {
   },
 
   // ==========================================
+  // RELATÓRIOS & MÉTRICAS
+  // ==========================================
+  async getRelatorioVendas() {
+    const apiRes = await this.request('/relatorios?tipo=vendas');
+    if (apiRes) return apiRes;
+
+    // Fallback local: agrega ItemPedido (dentro de pedidos PAGO) por produto
+    const mapa = new Map();
+    for (const p of this.mockData.produtos) {
+      mapa.set(p.idProduto, { idProduto: p.idProduto, nome: p.nome, marca: p.marca, quantidadeVendida: 0, faturamento: 0 });
+    }
+    for (const pedido of this.mockData.pedidos) {
+      if (pedido.statusPagamento !== 'PAGO') continue;
+      for (const item of (pedido.itens || [])) {
+        const lote = this.mockData.lotes.find(l => l.idLote === item.Lote_idLote);
+        const produtoId = lote ? lote.Produto_idProduto : null;
+        const alvo = mapa.get(produtoId);
+        if (alvo) {
+          alvo.quantidadeVendida += item.quantidade;
+          alvo.faturamento += item.quantidade * item.precoAplicado;
+        }
+      }
+    }
+    return [...mapa.values()].sort((a, b) => b.faturamento - a.faturamento);
+  },
+
+  async getRelatorioEstoque() {
+    const apiRes = await this.request('/relatorios?tipo=estoque');
+    if (apiRes) return apiRes;
+
+    return this.mockData.produtos.map(p => {
+      const lotesProd = this.mockData.lotes.filter(l => l.Produto_idProduto === p.idProduto && l.status === 'DISPONIVEL');
+      const saldoDisponivel = lotesProd.reduce((acc, l) => acc + l.quantAtual, 0);
+      const validades = lotesProd.filter(l => l.quantAtual > 0).map(l => l.dataValidade).sort();
+      return {
+        idProduto: p.idProduto, nome: p.nome, marca: p.marca,
+        saldoDisponivel, proximaValidade: validades[0] || null
+      };
+    }).sort((a, b) => a.nome.localeCompare(b.nome));
+  },
+
+  async getRelatorioConsumo() {
+    const apiRes = await this.request('/relatorios?tipo=consumo');
+    if (apiRes) return apiRes;
+
+    const mapa = new Map();
+    for (const c of this.mockData.categorias) {
+      mapa.set(c.idCategoria, { idCategoria: c.idCategoria, nome: c.nome, quantidadeVendida: 0, faturamento: 0 });
+    }
+    for (const pedido of this.mockData.pedidos) {
+      if (pedido.statusPagamento !== 'PAGO') continue;
+      for (const item of (pedido.itens || [])) {
+        const lote = this.mockData.lotes.find(l => l.idLote === item.Lote_idLote);
+        const produto = lote ? this.mockData.produtos.find(p => p.idProduto === lote.Produto_idProduto) : null;
+        if (!produto) continue;
+        for (const catId of (produto.categorias || [])) {
+          const alvo = mapa.get(catId);
+          if (alvo) {
+            alvo.quantidadeVendida += item.quantidade;
+            alvo.faturamento += item.quantidade * item.precoAplicado;
+          }
+        }
+      }
+    }
+    return [...mapa.values()].sort((a, b) => b.faturamento - a.faturamento);
+  },
+
+  async getEstatisticasGerais() {
+    const apiRes = await this.request('/relatorios?tipo=geral');
+    if (apiRes) return apiRes;
+
+    const lotesVencidos = this.mockData.lotes.filter(l => FefoEngine.isLoteVencido(l.dataValidade));
+    const lotesDisponiveis = this.mockData.lotes.filter(l => l.status === 'DISPONIVEL');
+    const pedidosPagos = this.mockData.pedidos.filter(p => p.statusPagamento === 'PAGO');
+    return {
+      produtosAtivos: this.mockData.produtos.filter(p => p.status === 'ATIVO').length,
+      lotesDisponiveis: lotesDisponiveis.length,
+      unidadesEmEstoque: lotesDisponiveis.reduce((acc, l) => acc + l.quantAtual, 0),
+      totalPedidos: pedidosPagos.length,
+      faturamentoTotal: pedidosPagos.reduce((acc, p) => acc + (p.total || 0), 0),
+      unidadesPerdidas: this.mockData.perdas.reduce((acc, p) => acc + (p.quantidade || 0), 0),
+      lotesVencidos: lotesVencidos.length
+    };
+  },
+
+  // ==========================================
   // AUTENTICAÇÃO
   // ==========================================
   async login(email, senha) {
+    try {
+      const response = await fetch(`${this.baseUrl}/usuarios/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
+      });
+      if (response.ok) {
+        const user = await response.json();
+        localStorage.setItem('duplacor_user', JSON.stringify(user));
+        return user;
+      }
+      if (response.status === 401) {
+        // Backend respondeu de verdade: credenciais inválidas. Não cai no fallback local.
+        return null;
+      }
+    } catch (e) {
+      // Backend offline: segue para o fallback local abaixo
+    }
+
+    // Fallback local (apenas quando o backend está indisponível)
     const user = this.mockData.usuarios.find(
       u => u.email.toLowerCase() === email.trim().toLowerCase() && u.senha === senha.trim()
     );
@@ -384,13 +565,70 @@ const ApiClient = {
     return null;
   },
 
+  async cadastro(nome, email, senha) {
+    try {
+      const response = await fetch(`${this.baseUrl}/usuarios/cadastro`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, senha })
+      });
+      if (response.ok) {
+        const user = await response.json();
+        localStorage.setItem('duplacor_user', JSON.stringify(user));
+        return { sucesso: true, usuario: user };
+      }
+      const erro = await response.json().catch(() => ({}));
+      return { sucesso: false, mensagem: erro.erro || 'Não foi possível concluir o cadastro.' };
+    } catch (e) {
+      // Backend offline: segue para o fallback local abaixo
+    }
+
+    // Fallback local
+    const existe = this.mockData.usuarios.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
+    if (existe) {
+      return { sucesso: false, mensagem: 'Já existe uma conta cadastrada com este e-mail.' };
+    }
+    const novoId = (Math.max(...this.mockData.usuarios.map(u => u.idUsuario), 0) || 0) + 1;
+    const novo = { idUsuario: novoId, nome, email, senha, perfil: 'CLIENTE' };
+    this.mockData.usuarios.push(novo);
+    this.saveLocal();
+    localStorage.setItem('duplacor_user', JSON.stringify(novo));
+    return { sucesso: true, usuario: novo };
+  },
+
+  async recuperarSenha(email) {
+    try {
+      const response = await fetch(`${this.baseUrl}/usuarios/recuperar-senha`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return { sucesso: true, novaSenha: data.novaSenha };
+      }
+      const erro = await response.json().catch(() => ({}));
+      return { sucesso: false, mensagem: erro.erro || 'Não foi possível recuperar a senha.' };
+    } catch (e) {
+      // Fallback local (backend offline): gera senha simples e atualiza o mock
+      const user = this.mockData.usuarios.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
+      if (!user) {
+        return { sucesso: false, mensagem: 'Não encontramos nenhuma conta cadastrada com este e-mail.' };
+      }
+      const novaSenha = Math.random().toString(36).substring(2, 10);
+      user.senha = novaSenha;
+      this.saveLocal();
+      return { sucesso: true, novaSenha };
+    }
+  },
+
   getUsuarioAtual() {
     const userStr = localStorage.getItem('duplacor_user');
     if (userStr) {
       try { return JSON.parse(userStr); } catch (e) {}
     }
-    // Default cliente de demonstração
-    return this.mockData.usuarios[1];
+    // Ninguém logado: navegação deve tratar como visitante (guest)
+    return null;
   },
 
   logout() {

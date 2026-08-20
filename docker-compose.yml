@@ -8,6 +8,7 @@ services:
     image: mysql:8.0
     container_name: duplacor-mysql
     restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
       MYSQL_DATABASE: ${DB_NAME:-duplacor}
       MYSQL_USER: ${DB_USER:-duplacor}

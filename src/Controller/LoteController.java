@@ -1,11 +1,14 @@
 package controller;
 
 import dao.LoteDAO;
+import dao.PerdaDAO;
 import dao.ProdutoDAO;
 import model.Lote;
+import model.Perda;
 import model.Produto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -15,15 +18,18 @@ public class LoteController {
 
     private final LoteDAO loteDAO;
     private final ProdutoDAO produtoDAO;
+    private final PerdaDAO perdaDAO;
 
     public LoteController() {
         this.loteDAO = new LoteDAO();
         this.produtoDAO = new ProdutoDAO();
+        this.perdaDAO = new PerdaDAO();
     }
 
-    public LoteController(LoteDAO loteDAO, ProdutoDAO produtoDAO) {
+    public LoteController(LoteDAO loteDAO, ProdutoDAO produtoDAO, PerdaDAO perdaDAO) {
         this.loteDAO = loteDAO;
         this.produtoDAO = produtoDAO;
+        this.perdaDAO = perdaDAO;
     }
 
     public boolean cadastrar(int quantInicial, LocalDate dataValidade, LocalDate dataEntrada, int produtoId) {
@@ -105,13 +111,27 @@ public class LoteController {
     }
 
     /**
-     * Rotina de monitoramento: bloqueia e atualiza status de lotes vencidos.
+     * Rotina de monitoramento: bloqueia lotes vencidos e registra automaticamente
+     * a perda do saldo restante, conforme o escopo ("Registro de Perdas: Inclusão
+     * automática de lotes expirados"). Um lote vencido sai da vitrine e todo o
+     * saldo que não foi comercializado vira um registro no Relatório de Perdas.
      */
     public int monitorarEBloquearVencidos() {
         List<Lote> vencidos = loteDAO.listarVencidos();
         int bloqueados = 0;
         for (Lote l : vencidos) {
             if (!"VENCIDO".equalsIgnoreCase(l.getStatus())) {
+                if (l.getQuantAtual() > 0) {
+                    Perda perda = new Perda(
+                            0,
+                            l.getQuantAtual(),
+                            LocalDateTime.now(),
+                            "PRODUTO VENCIDO",
+                            l.getIdLote()
+                    );
+                    perdaDAO.inserir(perda);
+                    loteDAO.atualizarQuantidade(l.getIdLote(), 0);
+                }
                 loteDAO.atualizarStatus(l.getIdLote(), "VENCIDO");
                 bloqueados++;
             }

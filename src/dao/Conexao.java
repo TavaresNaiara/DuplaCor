@@ -19,9 +19,10 @@ public class Conexao {
     private static final String DB_USER = getEnvOrDefault("DB_USER", "duplacor");
     private static final String DB_PASSWORD = getEnvOrDefault("DB_PASSWORD", "duplacor");
 
-    // Construção da URL JDBC
+    // Construção da URL JDBC (parâmetros extras garantem UTF-8 de ponta a ponta)
     private static final String URL = String.format(
-            "jdbc:mysql://%s:%s/%s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8",
+            "jdbc:mysql://%s:%s/%s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true" +
+            "&useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci",
             DB_HOST, DB_PORT, DB_NAME
     );
 

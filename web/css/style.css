@@ -924,4 +924,18 @@ button, input, select, textarea {
 @media (max-width: 600px) {
   .product-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
+  .admin-reports-grid { grid-template-columns: 1fr !important; }
+}
+
+/* =========================================================================
+   IMPRESSÃO / EXPORTAÇÃO EM PDF (via "Salvar como PDF" do navegador)
+   ========================================================================= */
+@media print {
+  .header-main, .footer-main, .modal-overlay, .toast-container, .no-print, .admin-nav-tabs, .admin-header-bar {
+    display: none !important;
+  }
+  body, .page-view { background: #ffffff !important; }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th, .data-table td { border: 1px solid #ccc; padding: 6px 10px; font-size: 11px; }
+  a { text-decoration: none; color: inherit; }
 }
