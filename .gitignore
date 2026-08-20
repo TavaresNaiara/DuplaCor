@@ -40,3 +40,4 @@ extracted_docx/
 *.docx
 texts.txt
 document.xml.txt
+*.docx

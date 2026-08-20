@@ -406,6 +406,23 @@ const ApiClient = {
     return novoPedido;
   },
 
+  async atualizarStatusPedido(idPedido, statusPagamento) {
+    const apiRes = await this.request(`/pedidos/${idPedido}`, {
+      method: 'PUT',
+      body: JSON.stringify({ statusPagamento })
+    });
+    if (apiRes) return true;
+
+    // Fallback local
+    const pedido = this.mockData.pedidos.find(p => p.idPedido === Number(idPedido));
+    if (pedido) {
+      pedido.statusPagamento = statusPagamento;
+      this.saveLocal();
+      return true;
+    }
+    return false;
+  },
+
   // ==========================================
   // PERDAS & AUDITORIA
   // ==========================================

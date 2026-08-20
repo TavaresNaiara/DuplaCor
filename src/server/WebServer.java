@@ -26,7 +26,7 @@ import java.util.*;
  */
 public class WebServer {
 
-    private static final int PORT = getPortOrDefault(8080);
+    private static final int PORT = getPortOrDefault(8081);
     private static final String WEB_DIR = "web";
     private static final DateTimeFormatter DT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 

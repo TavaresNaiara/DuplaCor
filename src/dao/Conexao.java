@@ -14,10 +14,10 @@ public class Conexao {
 
     // Variáveis de ambiente configuráveis
     private static final String DB_HOST = getEnvOrDefault("DB_HOST", "localhost");
-    private static final String DB_PORT = getEnvOrDefault("DB_PORT", "3307");
+    private static final String DB_PORT = getEnvOrDefault("DB_PORT", "3306");
     private static final String DB_NAME = getEnvOrDefault("DB_NAME", "duplacor");
-    private static final String DB_USER = getEnvOrDefault("DB_USER", "duplacor");
-    private static final String DB_PASSWORD = getEnvOrDefault("DB_PASSWORD", "duplacor");
+    private static final String DB_USER = getEnvOrDefault("DB_USER", "root");
+    private static final String DB_PASSWORD = getEnvOrDefault("DB_PASSWORD", "");
 
     // Construção da URL JDBC (parâmetros extras garantem UTF-8 de ponta a ponta)
     private static final String URL = String.format(

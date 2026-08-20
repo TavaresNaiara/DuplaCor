@@ -1151,9 +1151,30 @@ const App = {
         <td>${p.dataVenda}</td>
         <td>Cliente #${p.Usuario_idUsuario}</td>
         <td><strong>R$ ${p.total.toFixed(2).replace('.', ',')}</strong></td>
-        <td><span class="badge-status badge-pago">${p.statusPagamento}</span></td>
+        <td>
+          <select class="form-control" style="min-width: 120px; font-size: 0.85rem;" onchange="App.atualizarStatusPedido(${p.idPedido}, this.value)">
+            <option value="APROVADO" ${p.statusPagamento === 'APROVADO' ? 'selected' : ''}>APROVADO</option>
+            <option value="PAGO" ${p.statusPagamento === 'PAGO' ? 'selected' : ''}>PAGO</option>
+            <option value="ENTREGUE" ${p.statusPagamento === 'ENTREGUE' ? 'selected' : ''}>ENTREGUE</option>
+            <option value="CANCELADO" ${p.statusPagamento === 'CANCELADO' ? 'selected' : ''}>CANCELADO</option>
+          </select>
+        </td>
       </tr>
     `).join('');
+  },
+
+  async atualizarStatusPedido(idPedido, novoStatus) {
+    try {
+      const ok = await ApiClient.atualizarStatusPedido(idPedido, novoStatus);
+      if (ok) {
+        this.mostrarToast('Status do pedido atualizado com sucesso!', 'success');
+        this.renderAdminPedidos();
+      } else {
+        this.mostrarToast('Erro ao atualizar status do pedido.', 'error');
+      }
+    } catch (e) {
+      this.mostrarToast('Erro ao atualizar status do pedido.', 'error');
+    }
   },
 
   async monitorarValidadeAdmin() {

@@ -58,7 +58,7 @@ public class PedidoController {
 
         // Criar Pedido inicial com total zero
         Pedido pedido = new Pedido(0, LocalDateTime.now(), BigDecimal.ZERO,
-                (statusPagamento != null ? statusPagamento.toUpperCase() : "APROVADO"), usuarioId);
+                (statusPagamento != null ? statusPagamento.toUpperCase() : "APROVADO"), "NAO_INFORMADO", usuarioId);
         pedido.setUsuario(usuario);
 
         boolean inseriuPedido = pedidoDAO.inserir(pedido);
@@ -163,7 +163,7 @@ public class PedidoController {
         }
 
         Pedido pedido = new Pedido(0, LocalDateTime.now(), BigDecimal.ZERO,
-                (statusPagamento != null ? statusPagamento.toUpperCase() : "APROVADO"), usuarioId);
+                (statusPagamento != null ? statusPagamento.toUpperCase() : "APROVADO"), "NAO_INFORMADO", usuarioId);
         pedido.setUsuario(usuario);
 
         boolean inseriuPedido = pedidoDAO.inserir(pedido);

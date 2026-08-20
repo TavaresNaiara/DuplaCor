@@ -1,3 +1,8 @@
+USE duplacor;
+
+USE duplacor;
+
+
 -- ======================================================================
 -- Banco de Dados: duplacor
 -- Sistema de Gestão de Estoque e Venda de Esmaltes (Dupla Cor)
@@ -253,3 +258,53 @@ INSERT INTO `ItemPedido` (`idItemPedido`, `quantidade`, `precoAplicado`, `Lote_i
 INSERT INTO `UsuarioCarrinho` (`idUsuarioCarrinho`, `dataAdicao`, `quantidade`, `Usuario_idUsuario`, `Produto_idProduto`) VALUES
 (1, NOW(), 1, 3, 2), -- Juliana tem 1 Renda no carrinho
 (2, NOW(), 2, 3, 5); -- Juliana tem 2 Top Coat no carrinho
+
+-- ==========================================
+-- 1. FLUXO DO CLIENTE / USUÁRIO
+-- ==========================================
+
+-- 1.1 Após cadastrar o usuário na web:
+SELECT * FROM Usuario ORDER BY idUsuario DESC;
+
+-- 1.2 Após adicionar itens ao carrinho:
+SELECT * FROM UsuarioCarrinho;
+
+-- 1.3 Após finalizar o pedido:
+SELECT * FROM Pedido ORDER BY idPedido DESC LIMIT 1;
+SELECT * FROM ItemPedido ORDER BY idItemPedido DESC;
+SELECT * FROM Lote; -- Conferir se o lote com menor dataValidade teve baixa no quantAtual
+
+-- ==========================================
+-- 2. FLUXO DO ADMINISTRADOR
+-- ==========================================
+
+-- 2.1 Após cadastrar produto / categorias:
+SELECT * FROM Produto ORDER BY idProduto DESC LIMIT 1;
+SELECT * FROM Produto_has_Categoria;
+
+-- 2.2 Após dar entrada em novo lote:
+SELECT * FROM Lote ORDER BY idLote DESC LIMIT 1;
+
+-- 2.3 Após registrar uma perda/avaria:
+SELECT * FROM Perda ORDER BY idPerda DESC LIMIT 1;
+SELECT * FROM Lote;
+
+SELECT * FROM duplacor.Usuario;
+SHOW DATABASES;
+
+SELECT 
+    p.idPedido AS 'Nº Pedido',
+    u.nome AS 'Cliente',
+    p.dataVenda AS 'Data da Venda',
+    p.statusPagamento AS 'Status Pagamento',
+    p.total AS 'Total (R$)',
+    pr.nome AS 'Produto',
+    ip.quantidade AS 'Quantidade',
+    ip.precoAplicado AS 'Preço Unit. (R$)',
+    l.idLote AS 'Lote (FEFO)'
+FROM Pedido p
+JOIN Usuario u ON p.Usuario_idUsuario = u.idUsuario
+JOIN ItemPedido ip ON p.idPedido = ip.Pedido_idPedido
+JOIN Lote l ON ip.Lote_idLote = l.idLote
+JOIN Produto pr ON l.Produto_idProduto = pr.idProduto
+ORDER BY p.idPedido DESC;
