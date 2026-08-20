@@ -231,7 +231,16 @@ public class PedidoController {
         List<Pedido> pedidos = pedidoDAO.listarTodos();
         for (Pedido p : pedidos) {
             p.setUsuario(usuarioDAO.buscarPorId(p.getUsuarioId()));
-            p.setItensPedido(itemPedidoDAO.listarPorPedido(p.getIdPedido()));
+            List<ItemPedido> itens = itemPedidoDAO.listarPorPedido(p.getIdPedido());
+            for (ItemPedido item : itens) {
+                Lote lote = loteDAO.buscarPorId(item.getLoteId());
+                if (lote != null) {
+                    lote.setProduto(produtoDAO.buscarPorId(lote.getProdutoId()));
+                    item.setLote(lote);
+                }
+                item.setPedido(p);
+            }
+            p.setItensPedido(itens);
         }
         return pedidos;
     }
@@ -241,7 +250,16 @@ public class PedidoController {
         Usuario user = usuarioDAO.buscarPorId(usuarioId);
         for (Pedido p : pedidos) {
             p.setUsuario(user);
-            p.setItensPedido(itemPedidoDAO.listarPorPedido(p.getIdPedido()));
+            List<ItemPedido> itens = itemPedidoDAO.listarPorPedido(p.getIdPedido());
+            for (ItemPedido item : itens) {
+                Lote lote = loteDAO.buscarPorId(item.getLoteId());
+                if (lote != null) {
+                    lote.setProduto(produtoDAO.buscarPorId(lote.getProdutoId()));
+                    item.setLote(lote);
+                }
+                item.setPedido(p);
+            }
+            p.setItensPedido(itens);
         }
         return pedidos;
     }
